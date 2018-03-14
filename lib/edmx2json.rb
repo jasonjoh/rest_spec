@@ -5,15 +5,14 @@ require 'logger'
 require 'uri'
 require 'net/https'
 
-
 module SpecMaker
 	require_relative 'utils_e2j'
 	# Read and load the CSDL file
-	#f  = Net::HTTP.get(URI.parse('https://graph.microsoft.com/v1.0/$metadata')) 
-	f = File.read('../data/metadata.xml', :encoding => 'UTF-8')
+	f = Net::HTTP.get(URI.parse('https://graph.microsoft.com/v1.0/$metadata'))
+	#f = File.read('../data/metadata.xml', :encoding => 'UTF-8')
 
-	# Convert to JSON format. 
-	csdl=JSON.parse(Hash.from_xml(f).to_json, {:symbolize_names => true}) 
+	# Convert to JSON format.
+	csdl=JSON.parse(Hash.from_xml(f).to_json, {:symbolize_names => true})
 	File.open(CSDL_LOCATION + 'metadata' + '.json', "w") do |f|
 		f.write(JSON.pretty_generate csdl, :encoding => 'UTF-8')
 	end
@@ -26,7 +25,7 @@ module SpecMaker
 		schema[:EnumType].each do |item|
 			puts "-> Processing Enum #{item[:Name]}"
 			enum = {}
-			if item[:IsFlags] 
+			if item[:IsFlags]
 				enum[:isExclusive] = false
 			else
 				enum[:isExclusive] = true
@@ -37,31 +36,28 @@ module SpecMaker
 				entry[:value] = member[:Value]
 				entry[:description] = ""
 				enum[:options][member[:Name].to_sym] = entry
-			end	
+			end
 			@enum_objects[camelcase(item[:Name]).to_sym] = enum
 			@ienums = @ienums + 1
 		end
-    elsif schema[:EnumType].is_a?(Hash)    
-            puts "-> Processing Enum (hash) #{schema[:EnumType][:Name]}, #{schema[:EnumType]}"
-			enum = {}
-			if schema[:EnumType][:IsFlags] 
-				enum[:isExclusive] = false
-			else
-				enum[:isExclusive] = true
-			end
-			enum[:options] = {}
-			schema[:EnumType][:Member].each do |member|
-				entry = {}
-				entry[:value] = member[:Value]
-				entry[:description] = ""
-				enum[:options][member[:Name].to_sym] = entry
-			end	
-			@enum_objects[camelcase(schema[:EnumType][:Name]).to_sym] = enum
-			@ienums = @ienums + 1
+	elsif schema[:EnumType].is_a?(Hash)
+		puts "-> Processing Enum (hash) #{schema[:EnumType][:Name]}, #{schema[:EnumType]}"
+		enum = {}
+		if schema[:EnumType][:IsFlags]
+			enum[:isExclusive] = false
+		else
+			enum[:isExclusive] = true
+		end
+		enum[:options] = {}
+		schema[:EnumType][:Member].each do |member|
+			entry = {}
+			entry[:value] = member[:Value]
+			entry[:description] = ""
+			enum[:options][member[:Name].to_sym] = entry
+		end	
+		@enum_objects[camelcase(schema[:EnumType][:Name]).to_sym] = enum
+		@ienums = @ienums + 1
 	end
-			
-
-
 
 	File.open(ENUMS, "w") do |f|
 		f.write(JSON.pretty_generate @enum_objects, :encoding => 'UTF-8')
@@ -105,7 +101,7 @@ module SpecMaker
 	schema[:ComplexType].each do |entity|
 		@ictypes = @ictypes + 1
 		@json_object = nil 
-		@json_object = deep_copy(@template) 
+		@json_object = deep_copy(@template)
 
 		puts "-> Processing Complex Type #{entity[:Name]}"
 		@json_object[:name] = camelcase entity[:Name]
@@ -133,7 +129,6 @@ module SpecMaker
 		GC.start
 	end
 
-
 	schema[:EntityType].each do |entity|
 		puts "-> Processing Entity #{entity[:Name]}"
 		@ient = @ient + 1
@@ -144,7 +139,7 @@ module SpecMaker
 		@json_object = deep_copy(@template)
 		
 		if entity.has_key? :OpenType 
-			@json_object[:isOpenType] = true if entity[:OpenType] 	
+			@json_object[:isOpenType] = true if entity[:OpenType]
 			puts "*---> OpenType"
 		end		 		
 		
@@ -166,16 +161,19 @@ module SpecMaker
 			# puts "2: #{entity[:Key]}"
 			# puts "3: #{@base_types.keys}"
 			if !@base_types[baseType.to_sym].nil?
-				entity[:Key] = @base_types[baseType.to_sym][:Key] 
-			
-				entity[:Property] = merge_members(entity[:Property], 
-													@base_types[baseType.to_sym][:Property])
-				entity[:NavigationProperty]  = merge_members(entity[:NavigationProperty],
-												@base_types[baseType.to_sym][:NavigationProperty], entity[:Name])
-				@base_types[entity[:Name].to_sym] = deep_copy(entity)	
+				entity[:Key] = @base_types[baseType.to_sym][:Key]
+
+				entity[:Property] = merge_members(
+					entity[:Property], 
+					@base_types[baseType.to_sym][:Property])
+				entity[:NavigationProperty]  = merge_members(
+					entity[:NavigationProperty],
+					@base_types[baseType.to_sym][:NavigationProperty],
+					entity[:Name])
+				@base_types[entity[:Name].to_sym] = deep_copy(entity)
 			end
 		end
-		
+
 		@json_object[:name] = camelcase entity[:Name]
 		if !entity[:Key].nil? && entity[:Key][:PropertyRef].is_a?(Hash)
 			@key_save = entity[:Key][:PropertyRef][:Name]
@@ -185,7 +183,7 @@ module SpecMaker
 				@key_save =  innerItem[:Name] + ' ' + @key_save
 			end
 		end
-		
+
 		parse_annotations(entity[:Name], entity[:Annotation])
 		set_description(entity[:Name], @json_object)
 
@@ -200,7 +198,7 @@ module SpecMaker
 
 		# PROCESS Navigation Properties
 		if entity[:NavigationProperty].is_a?(Array)
-			entity[:NavigationProperty].each do |item|		
+			entity[:NavigationProperty].each do |item|
 				@json_object[:properties].push process_navigation(entity[:Name], item)
 			end
 		elsif entity[:NavigationProperty].is_a?(Hash)
@@ -230,7 +228,7 @@ module SpecMaker
 		end
 		# if !@json_object[:isComplexType]
 		# 	create_auto_examplefiles((@json_object[:name]).downcase, false)		 
-		# end		
+		# end
 		GC.start
 	end
 
@@ -240,12 +238,12 @@ module SpecMaker
 		@ientityset = @ientityset + 1
 		@icollection = @icollection + 1
 		@json_object = nil 
-		@json_object = deep_copy(@template) 
+		@json_object = deep_copy(@template)
 
 		puts "-> Processing EntitySet Type #{entity[:Name]}"
 		@json_object[:name] = camelcase entity[:Name]
 		@json_object[:isEntitySet] = true
-		#dt = entity[:EntityType][(entity[:EntityType].rindex('.') + 1)..-1].chomp(')')		
+		#dt = entity[:EntityType][(entity[:EntityType].rindex('.') + 1)..-1].chomp(')')
 		dt = get_type(entity[:EntityType])
 		@json_object[:collectionOf] = dt
 
@@ -268,7 +266,7 @@ module SpecMaker
 		File.open("#{JSON_SOURCE_FOLDER}#{fileName}", "w") do |f|
 			f.write(JSON.pretty_generate @json_object, :encoding => 'UTF-8')
 		end
-		#create_auto_examplefiles((@json_object[:name]).downcase, true)		 
+		#create_auto_examplefiles((@json_object[:name]).downcase, true)
 
 		fill_rest_path("/#{(@json_object[:name])}", dt, true)
 
@@ -288,7 +286,7 @@ module SpecMaker
 		@isingleton = @isingleton + 1	
 		dt = get_type(schema[:EntityContainer][:Singleton][:Type])
 		# No need to write singletons. 
-		puts "calling fill rest path with: /#{schema[:EntityContainer][:Singleton][:Name].downcase}, #{dt} " 
+		puts "calling fill rest path with: /#{schema[:EntityContainer][:Singleton][:Name].downcase}, #{dt} "
 		fill_rest_path("/#{schema[:EntityContainer][:Singleton][:Name].downcase}", dt, false)
 	end
 
@@ -307,6 +305,6 @@ module SpecMaker
 	#puts "--> Example files written: #{@iexampleFilesWrittem}"
 	puts "Parameters: #{@iparam}"
 	puts "Enums: #{@ienums}"
-	#puts "Collections: #{@icollection}"	
-	puts "EntitySet: #{@ientityset}"	
+	#puts "Collections: #{@icollection}"
+	puts "EntitySet: #{@ientityset}"
 end
