@@ -6,6 +6,7 @@ require 'logger'
 module SpecMaker
 	JSON_BASE_FOLDER = "../jsonFiles/"
 	JSON_SOURCE_FOLDER = "../jsonFiles/rest/"
+	JSON_SETTINGS_FOLDER = "../jsonFiles/settings/"
 	JSON_PREV_SOURCE_FOLDER = "../jsonFiles/rest_previous/"
 	ENUMS = JSON_BASE_FOLDER + 'settings/restenums.json'
 	ANNOTATIONS = JSON_BASE_FOLDER + 'settings/annotations.json'
@@ -39,6 +40,7 @@ module SpecMaker
 #
 	Dir.mkdir(JSON_SOURCE_FOLDER) unless File.exists?(JSON_SOURCE_FOLDER)
 	FileUtils.rm Dir.glob(JSON_SOURCE_FOLDER + '/*')
+	Dir.mkdir(JSON_SETTINGS_FOLDER) unless File.exists?(JSON_SETTINGS_FOLDER)
 #
 
 # Log file
