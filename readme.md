@@ -105,8 +105,8 @@ When you submit PR, you may get validation errors. Some of known issues with the
 
 There may be others... Go through each of the error and fix them prior to proceeding. Any PR with errors can't be merged. 
 
-## TOC (Table of Content on graph.microwsoft.io website) 
-Contact us if you need updates to update TOC changes. 
+## TOC updates
+Contact us if you need to update the TOC. 
 
 ## ADVANCED: Run Markdown Scanner tool locally for large set of changes
 
