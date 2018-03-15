@@ -39,6 +39,10 @@ You should be set to go..
 1. If you need to run the tool for different versions, save the markdowns/ folder content elsewhere.
 1. Copy the API/resource files to MS Graph fork local copy folders to make your edits.
 
+Note:
+* Do not even attempt to run it against ~/beta (or your custom version based on ~/beta). It will take a while to run edmx2json.rb and will stack overflow when you run json2md.rb.
+* Instead, publish a custom version by add your workload to v1.0 and run the tool.
+
 ## Edit spec files
 
 Add rich descriptions to the generated documentation to help our customers make sense of huge amount of APIs that are being enabled through Microsoft Graph.
