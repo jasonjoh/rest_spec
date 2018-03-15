@@ -32,7 +32,6 @@ You should be set to go..
 1. Open `edmx2json.rb` file. Update the XML location in the line: `f  = Net::HTTP.get(URI.parse('https://graph.microsoft.com/v1.0/$metadata'))`
 1. If you run into SSL issues, just download the XML file locally and store the XML file into `/data` folder under the name `metadata.xml` and comemnt the above line and uncomment the below line: `f = File.read('../data/metadata.xml', :encoding => 'UTF-8')
 `. This will ensure that file is read locally and you don't have to go over the network. 
-1. Create a folder called logs on the same level as `rest_spec` folder. 
 1. Run `ruby edmx2json.rb` command to generate intermediary JSON files. This takes more than 1-min to 3-hours (depending on the size of XML file) to complete. 
 1. Run `ruby json2md.rb` command to generate markdonw files. It can take 1-15 minutes.
 1. Find your Markdown templates in the `rest_spec/markdowns` folder. 

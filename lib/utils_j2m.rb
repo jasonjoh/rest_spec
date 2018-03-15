@@ -107,7 +107,7 @@ module SpecMaker
 	UUID_DATE = "<!-- uuid: " + "8fcb5dbc-d5aa-4681-8e31-b001d5168d79"  + "\n" + "2015-10-25 14:57:30 UTC" + " -->"
 	
 	# Log file
-	LOG_FOLDER = '../../logs'
+	LOG_FOLDER = '../logs'
 	Dir.mkdir(LOG_FOLDER) unless File.exists?(LOG_FOLDER)
 
 	LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
