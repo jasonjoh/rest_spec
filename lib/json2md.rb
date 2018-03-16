@@ -681,7 +681,7 @@ module SpecMaker
 				else
 					if isProperty
 						returnLink = "[" + @jsonHash[:name] + "](" + @jsonHash[:name].downcase + ".md)"
-						@mdlines.push "|[Get #{@jsonHash[:name]}](../api/#{@jsonHash[:name].downcase}_get.md) | #{returnLink} |Read properties and relationships of #{uncapitalize @jsonHash[:name]} object.|" + NEWLINE
+						@mdlines.push "| [Get #{@jsonHash[:name]}](../api/#{@jsonHash[:name].downcase}_get.md) | #{returnLink} | Read properties and relationships of #{uncapitalize @jsonHash[:name]} object. |" + NEWLINE
 					end
 				end
 				create_get_method
@@ -708,7 +708,7 @@ module SpecMaker
 						else
 							returnLink = "[" + prop[:dataType] + "](" + prop[:dataType].downcase + ".md)"
 						end
-						@mdlines.push "|[#{postName}](#{postLink}) |#{returnLink}| Create a new #{useName} by posting to the #{prop[:name]} collection.|" + NEWLINE
+						@mdlines.push "| [#{postName}](#{postLink}) | #{returnLink} | Create a new #{useName} by posting to the #{prop[:name]} collection. |" + NEWLINE
 						if File.exists?("#{MARKDOWN_API_FOLDER}/filename")
 							puts "POST create file already exists!"
 						else
@@ -737,7 +737,7 @@ module SpecMaker
 							listLink = "../api/#{filename}"
 
 							# puts "$----> #{filename} #{@jsonHash[:name]},, #{prop[:name]}"
-							@mdlines.push "|[List #{prop[:name]}](#{listLink}) |#{returnLink} collection| Get a #{useName} object collection.|" + NEWLINE
+							@mdlines.push "| [List #{prop[:name]}](#{listLink}) | #{returnLink} collection | Get a #{useName} object collection. |" + NEWLINE
 							saveJsonHash = deep_copy @jsonHash
 							@jsonHash[:name] = prop[:name]
 							@jsonHash[:collectionOf] = prop[:dataType]
@@ -752,7 +752,7 @@ module SpecMaker
 
 			if patchable
 				returnLink = "[" + @jsonHash[:name] + "](" + @jsonHash[:name].downcase + ".md)"
-				@mdlines.push "|[Update](../api/#{@jsonHash[:name].downcase}_update.md) | #{returnLink}	|Update #{@jsonHash[:name]} object. |" + NEWLINE
+				@mdlines.push "| [Update](../api/#{@jsonHash[:name].downcase}_update.md) | #{returnLink} | Update #{@jsonHash[:name]} object. |" + NEWLINE
 				create_patch_method propreties
 				# mtd = deep_copy(@struct[:method])
 				# mtd[:name] = 'auto_patch'
@@ -765,7 +765,7 @@ module SpecMaker
 			end
 
 			if @jsonHash[:allowDelete]
-				@mdlines.push "|[Delete](../api/#{@jsonHash[:name].downcase}_delete.md) | None |Delete #{@jsonHash[:name]} object. |" + NEWLINE
+				@mdlines.push "| [Delete](../api/#{@jsonHash[:name].downcase}_delete.md) | None | Delete #{@jsonHash[:name]} object. |" + NEWLINE
 				mtd = deep_copy(@struct[:method])
 				mtd[:displayName] = "Delete #{@jsonHash[:name]}"
 				mtd[:name] = 'auto_delete'
@@ -880,8 +880,8 @@ module SpecMaker
 				postName = "Create " + useName
 				filename = "#{item[:collectionOf].downcase}_post_#{item[:name].downcase}.md"
 				postLink = "../api/#{item[:collectionOf].downcase}_post_#{item[:name].downcase}.md"
-				returnLink = "[" + item[:collectionOf]	 + "](" + item[:collectionOf].downcase + ".md)"
-				service_lines.push "|[#{postName}](#{postLink}) |#{returnLink}| Create a new #{useName} by posting to the #{item[:name] } collection.|" + NEWLINE
+				returnLink = "[" + item[:collectionOf] + "](" + item[:collectionOf].downcase + ".md)"
+				service_lines.push "| [#{postName}](#{postLink}) | #{returnLink} | Create a new #{useName} by posting to the #{item[:name] } collection. |" + NEWLINE
 				if File.exists?("#{MARKDOWN_API_FOLDER}/filename")
 					puts "EntitySet POST create file already exists!"
 				else

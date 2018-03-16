@@ -23,15 +23,23 @@ module SpecMaker
 	PIPE = '|'
 	TWONEWLINES = "\n\n"
 
-	TABLE_2ND_LINE =  "|:---------------|:--------|:----------|" + NEWLINE
-	TABLE_2ND_LINE_2COL =  "|:---------------|:----------|" + NEWLINE
-	PROPERTY_HEADER = "| Property	   | Type	|Description|" + NEWLINE
-	PARAM_HEADER = "| Parameter	   | Type	|Description|" + NEWLINE
-	HTTP_HEADER = "| Name       | Description|" + NEWLINE
-	RELATIONSHIP_HEADER = "| Relationship | Type	|Description|" + NEWLINE
-	TASKS_HEADER = "| Method		   | Return Type	|Description|" + NEWLINE
+	TABLE_2ND_LINE =       "|:-------------|:------------|:------------|" + NEWLINE
+	PROPERTY_HEADER =      "| Property     | Type        | Description |" + NEWLINE
+	PARAM_HEADER =         "| Parameter    | Type        | Description |" + NEWLINE
+	RELATIONSHIP_HEADER =  "| Relationship | Type        | Description |" + NEWLINE
+	TASKS_HEADER =         "| Method       | Return Type | Description |" + NEWLINE
 
-	PREREQ = HEADER2 + "Permissions" + NEWLINE + "One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](../../../concepts/permissions_reference.md)." + NEWLINE + NEWLINE + "|Permission type      | Permissions (from least to most privileged)              |" + NEWLINE + "|:--------------------|:---------------------------------------------------------|" + NEWLINE + "|Delegated (work or school account) |    |" + NEWLINE + "|Delegated (personal Microsoft account) |    |" + NEWLINE + "|Application |  | " + NEWLINE + NEWLINE
+	TABLE_2ND_LINE_2COL =  "|:--------------|:--------------|" + NEWLINE
+	HTTP_HEADER =          "| Name          | Description   |" + NEWLINE
+	# HTTP_HEADER_SAMPLE = "| Authorization | Bearer {code} |" + NEWLINE + "| Workbook-Session-Id  | Workbook session Id that determines if changes are persisted or not. Optional.|"
+	HTTP_HEADER_SAMPLE =   "| Authorization | Bearer {code} |"
+
+	PREREQ = HEADER2 + "Permissions" + NEWLINE + "One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](../../../concepts/permissions_reference.md)." + NEWLINE + NEWLINE + \
+			"|Permission type                        | Permissions (from least to most privileged)              |" + NEWLINE + \
+			"|:--------------------------------------|:---------------------------------------------------------|" + NEWLINE + \
+			"|Delegated (work or school account)     | Not supported. |" + NEWLINE + \
+			"|Delegated (personal Microsoft account) | Not supported. |" + NEWLINE + \
+			"|Application                            | Not supported. |" + NEWLINE + NEWLINE
 
 	QRY_HEADER = "|Name|Value|Description|"
 	QRY_2nd_LINE = "|:---------------|:--------|:-------|"
@@ -43,9 +51,6 @@ module SpecMaker
 	QRY_TOP = "|$top|int|The number of items to return in a result set.|"
 	QRY_SKIP = "|$skip|int|The number of items to skip in a result set.|"
 	QRY_COUNT = "|$count|none|The count of related entities can be requested by specifying the $count query option.|"
-
-	# HTTP_HEADER_SAMPLE = "| Authorization  | Bearer {code}|" + NEWLINE + "| Workbook-Session-Id  | Workbook session Id that determines if changes are persisted or not. Optional.|"
-	HTTP_HEADER_SAMPLE = "| Authorization  | Bearer {code}|"
 
 	odata_types = %w[Binary Boolean Byte Date DateTimeOffset Decimal Double Duration
 				Guid Int Int16 Int32 Int64 SByte Single Stream String TimeOfDay
