@@ -1,0 +1,5 @@
+/data/metadata.json
+/jsonFiles/*
+!/jsonFiles/template
+/logs/*
+/markdowns/*

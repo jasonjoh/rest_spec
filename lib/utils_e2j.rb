@@ -2,33 +2,32 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'json'
 require 'logger'
-# require 'FileUtils'
-
-
+# require 'FileUtils'
 module SpecMaker
 	JSON_BASE_FOLDER = "../jsonFiles/"
 	JSON_SOURCE_FOLDER = "../jsonFiles/rest/"
+	JSON_SETTINGS_FOLDER = "../jsonFiles/settings/"
 	JSON_PREV_SOURCE_FOLDER = "../jsonFiles/rest_previous/"
 	ENUMS = JSON_BASE_FOLDER + 'settings/restenums.json'
 	ANNOTATIONS = JSON_BASE_FOLDER + 'settings/annotations.json'
 	CSDL_LOCATION = "../data/"
-	
+
 	JSON_EXAMPLE_FOLDER = "../jsonFiles/examples/"
 	BASETYPES = %w[Entity directoryObject Attachment Message OutlookItem Extension]
 	BASETYPES_ALLCASE = BASETYPES.concat BASETYPES.map(&:downcase)
 
 	####
-	# This is to address the special entityType: 
+	# This is to address the special entityType:
 	# <EntityType Name="Extension" BaseType="Microsoft.Graph.Entity" />
-	# Here, there is no property or nav.prop defined for Extension. It simply 
-	# points back to the Entity. If more such cases arise, add an entry here. 
+	# Here, there is no property or nav.prop defined for Extension. It simply
+	# points back to the Entity. If more such cases arise, add an entry here.
 	#
 	##
 	BASETYPE_MAPPING = {
 		"Extension" => "extension",
 		"extension" => "extension"
 	}
-	# Load the template 
+	# Load the template
 	# JSON_TEMPLATE = "../jsonFiles/template/restresourcetemplate.json"
 	# @template = JSON.parse(File.read(JSON_TEMPLATE, :encoding => 'UTF-8'), {:symbolize_names => true})
 
@@ -38,26 +37,23 @@ module SpecMaker
 	@template = @struct[:object]
 	@service = @struct[:serviceSettings]
 
-
-# 
+#
 	Dir.mkdir(JSON_SOURCE_FOLDER) unless File.exists?(JSON_SOURCE_FOLDER)
 	FileUtils.rm Dir.glob(JSON_SOURCE_FOLDER + '/*')
-# 
-
-
+	Dir.mkdir(JSON_SETTINGS_FOLDER) unless File.exists?(JSON_SETTINGS_FOLDER)
+#
 
 # Log file
-	LOG_FOLDER = '../../logs'
+	LOG_FOLDER = '../logs'
 	Dir.mkdir(LOG_FOLDER) unless File.exists?(LOG_FOLDER)
 
-  LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
+	LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
 	if File.exists?("#{LOG_FOLDER}/#{LOG_FILE}")
 		File.delete("#{LOG_FOLDER}/#{LOG_FILE}")
 	end
 	@logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
 	@logger.level = Logger::DEBUG
-# End log file
-
+# End log file
 	@iprop = 0
 	@ienums = 0
 	@inprop = 0
@@ -68,14 +64,14 @@ module SpecMaker
 	@iaction = 0
 	@ifunction = 0
 	@ientityset = 0
-	@icollection = 0	
+	@icollection = 0
 	@ibasetypemerges = 0
 	@iann = 0
 	@isingleton = 0
 
 	@methods = {}
 	@enum_objects = {}
-	@json_object = nil 
+	@json_object = nil
 	@base_types = {}
 	@iexampleFilesWrittem = 0
 	@annotations = {}
@@ -100,10 +96,10 @@ module SpecMaker
 			end
 		end
 	end
-	
+
 	def self.parse_annotation(target, term, annotation)
 		#puts "-> Processing Annotation; Target: #{target}; Term: #{term}; Annotation: #{annotation}"
-		
+
 		if annotation[:Term]
 			term = get_type(annotation[:Term]).downcase
 		elsif annotation[:Property]
@@ -113,7 +109,7 @@ module SpecMaker
 		if !@annotations[target]
 			@annotations[target] = {}
 		end
-		
+
 		if annotation[:Bool]
 			if annotation[:Bool].downcase == 'true'
 				@annotations[target][term] = true
@@ -136,7 +132,7 @@ module SpecMaker
 			# TODO
 		end
 	end
-	
+
 	def self.set_description(target, itemToSet)
 	  target = target.downcase
 	  #puts "-> Getting Annotation; Target: #{target}"
@@ -150,7 +146,7 @@ module SpecMaker
 	###
 	# Create object_method-name.md file in lowercase.
 	#
-	#	
+	#
 	def self.create_examplefile(objectName=nil, methodName=nil)
 		File.open(JSON_EXAMPLE_FOLDER + (objectName + '_' + methodName).downcase + ".md", "w") do |f|
 			f.write('##### Example', :encoding => 'UTF-8')
@@ -159,25 +155,25 @@ module SpecMaker
 	end
 
 	###
-	# Create example files for object/collection. 
+	# Create example files for object/collection.
 	#
-	#	
+	#
 	def self.create_auto_examplefiles(objectName=nil, isCollection)
 		if !isCollection
 			create_examplefile(objectName, 'auto_get')
 			create_examplefile(objectName, 'auto_post')
 			create_examplefile(objectName, 'auto_patch')
 			create_examplefile(objectName, 'auto_put')
-			create_examplefile(objectName, 'auto_delete')			
+			create_examplefile(objectName, 'auto_delete')
 		else
-			create_examplefile(objectName, 'auto_list')							
+			create_examplefile(objectName, 'auto_list')
 		end
 	end
 
 	###
 	# Create example files from array that contains many methods (1 per method)
 	#
-	#	
+	#
 	def self.create_basetype_examplefiles(methods=[], objectName=nil)
 		methods.each do |item|
 			create_examplefile(objectName, item[:name])
@@ -186,17 +182,17 @@ module SpecMaker
 
 	###
 	# To prevent shallow copy errors, need to get a new object each time.
-	# 
-	#	
+	#
+	#
 	def self.deep_copy(o)
 	  Marshal.load(Marshal.dump(o))
 	end
 
 	###
-	# Copy method description, display name, parameter descriptions, etc. 
-	#	from an existing JSON file from previous run. 
-	# 
-	##	
+	# Copy method description, display name, parameter descriptions, etc.
+	#	from an existing JSON file from previous run.
+	#
+	#
 	def self.preserve_method_descriptions (objectName=nil, method=nil)
 		fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
 		if File.file?(fullpath)
@@ -213,7 +209,7 @@ module SpecMaker
 								param[:description] = paramOld[:description] if !paramOld[:description].empty?
 							end
 						end
-					end	
+					end
 				end
 			end
 		end
@@ -224,7 +220,7 @@ module SpecMaker
 		fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
 		if File.file?(fullpath)
 			prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
-			@json_object[:description] = prevObject[:description]			
+			@json_object[:description] = prevObject[:description]
 			prevProperties = prevObject[:properties]
 			prevProperties.each do |item|
 				@json_object[:properties].each do |currentProp|
@@ -248,31 +244,31 @@ module SpecMaker
 
 	def self.merge_members(current=nil, base=nil, objectName=nil)
 
-		# if objectName != nil 
+		# if objectName != nil
 		# 	if base.is_a?(Hash)
 		# 		dt = get_type(base[:Type])
 		# 		return current if dt.downcase == objectName.downcase
 		# 	elsif base.is_a?(Array)
-		# 		base.each_with_index do |item, i|	
-		# 			dt = get_type(item[:Type])	
- 	# 				base.delete_at(i) if dt == objectName
+		# 		base.each_with_index do |item, i|
+		# 			dt = get_type(item[:Type])
+		# 				base.delete_at(i) if dt == objectName
 		# 		end
 		# 	end
 		# end
 
 		arr = []
-		if current.nil? 
+		if current.nil?
 			return base
 		elsif current.is_a?(Array)
-			if base.nil? 
+			if base.nil?
 				return current
 			elsif base.is_a?(Array)
 				return current.concat base
 			elsif base.is_a?(Hash)
-				return current.push base 
+				return current.push base
 			end
 		elsif current.is_a?(Hash)
-			if base.nil? 
+			if base.nil?
 				return current
 			elsif base.is_a?(Array)
 				arr = base
@@ -291,12 +287,12 @@ module SpecMaker
 		dt = get_type(item[:Type])
 		prop[:isCollection] = true if item[:Type].start_with?('Collection(')
 		prop[:dataType] = dt
-		if @enum_objects.has_key?(dt.to_sym) 
-			prop[:enumName] = dt 
+		if @enum_objects.has_key?(dt.to_sym)
+			prop[:enumName] = dt
 			prop[:dataType] = "string"
 		end
 		if @key_save.include?(item[:Name])
-			prop[:isKey], prop[:isReadOnly] = true, true 
+			prop[:isKey], prop[:isReadOnly] = true, true
 		end
 		if item[:Nullable] == 'false'
 			prop[:isNullable] = false
@@ -305,7 +301,7 @@ module SpecMaker
 			prop[:isUnicode] = false
 		end
 		@iprop = @iprop + 1
-		
+
 		annotationTarget = className + "/" + item[:Name]
 		parse_annotations(annotationTarget, item[:Annotation])
 		set_description(annotationTarget, prop)
@@ -327,7 +323,7 @@ module SpecMaker
 		end
 		if item[:Unicode] == 'false'
 			prop[:isUnicode] = false
-		end		
+		end
 		@inprop = @inprop + 1
 		
 		annotationTarget = className + "/" + item[:Name]
@@ -343,8 +339,8 @@ module SpecMaker
 		dt = get_type(item[:Type])
 		prop[:isCollection] = true if item[:Type].start_with?('Collection(')
 		prop[:dataType] = dt
-		if @enum_objects.has_key?(dt.to_sym) 
-			prop[:enumName] = dt 
+		if @enum_objects.has_key?(dt.to_sym)
+			prop[:enumName] = dt
 			prop[:dataType] = "String"
 		end
 		if item[:Nullable] == 'false'
@@ -353,17 +349,17 @@ module SpecMaker
 		if item[:Unicode] == 'false'
 			prop[:isUnicode] = false
 		end
-		
+
 		annotationTarget = className + "/" + item[:Name]
 		parse_annotations(annotationTarget, item[:Annotation])
 		set_description(annotationTarget, prop)
 
-    return prop		
+	return prop
 	end
 
 	# Process methods
 	def self.process_method (item=nil, type=nil)
-		mtd = deep_copy(@struct[:method]) 
+		mtd = deep_copy(@struct[:method])
 		mtd[:name] = camelcase item[:Name].chomp(')')
 		if type == 'function'
 			mtd[:isFunction] = true
@@ -381,7 +377,7 @@ module SpecMaker
 		if item[:Parameter].is_a?(Array)
 			mtd[:parameters] = []
 			item[:Parameter].each_with_index do |p, i|
-				parm = deep_copy(@struct[:parameter]) 
+				parm = deep_copy(@struct[:parameter])
 				next if i == 0
 				@iparam = @iparam + 1
 				parm[:name] = camelcase p[:Name]
@@ -395,7 +391,6 @@ module SpecMaker
 				if p[:Unicode] == 'false'
 					parm[:isUnicode] = false
 				end
-				
 
 				mtd[:parameters].push parm
 			end
@@ -408,68 +403,87 @@ module SpecMaker
 			enamef = item[:Parameter][:Type]
 		end
 
-		entity_name = enamef[(enamef.rindex('.') + 1)..-1]		
+		entity_name = enamef[(enamef.rindex('.') + 1)..-1]
 		entity_name = entity_name.chomp(')')
 
-		mtd = preserve_method_descriptions(entity_name, mtd)		
+		mtd = preserve_method_descriptions(entity_name, mtd)
 		if @methods.has_key?(entity_name.downcase.to_sym)
 			@methods[entity_name.downcase.to_sym].push mtd
-		else			
-			@methods[entity_name.downcase.to_sym] = []			
+		else
+			@methods[entity_name.downcase.to_sym] = []
 			@methods[entity_name.downcase.to_sym].push mtd
 		end
-		#create_examplefile(entity_name, mtd[:name])				
-		return 
+		#create_examplefile(entity_name, mtd[:name])
+		return
 	end
 
-	# todo: avoid file I/O and do this in-memory prior to writing the JSON.
 	def self.fill_rest_path (parentPath=nil, entity=nil, isParentCollection=true)
+		jsonCache = Hash.new
+		fill_rest_path_internal(parentPath, entity, isParentCollection, jsonCache)
+		write_json_from_cache(jsonCache)
+	end
+
+	def self.read_json_from_cache (jsonCache=nil, fullpath=nil)
+		value = jsonCache[fullpath]
+
+		if value.nil?
+			value = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'))
+			jsonCache[fullpath] = value
+		end
+
+		return value;
+	end
+
+	def self.write_json_from_cache (jsonCache=nil)
+		jsonCache.each_pair do |fullpath,object|
+			File.open(fullpath, "w") do |f|
+				f.write(JSON.pretty_generate object, :encoding => 'UTF-8')
+			end
+		end
+	end
+
+	def self.fill_rest_path_internal (parentPath=nil, entity=nil, isParentCollection=true, jsonCache=nil)
 
 		fullpath = JSON_SOURCE_FOLDER + '/' + entity.downcase + '.json'
 		path={}
 		ids = ''
 
-
 		# append Id at the end.
 		if File.file?(fullpath)
-			object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'))
+			object = read_json_from_cache(jsonCache, fullpath)
 
 			# Check if the path already exists. This logic will eliminate deep redundant paths.
-			# May lose some important ones.. but if this check is removed, some really deep/complex 
-			# logic needs to be inserted to add the 
+			# May lose some important ones.. but if this check is removed, some really deep/complex
+			# logic needs to be inserted to add the
 			object["restPath"].keys.each do |k|
-				if parentPath.downcase.include?(k.to_s.downcase) 
-					return 
+				if parentPath.downcase.include?(k.to_s.downcase)
+					return
 				end
 			end
-			
+
 			# Construct path and remove empty | and <> at the end (account for no key being available on the object.)
 			object["properties"].each do |item|
 				if item["isKey"]
 					ids = ids + item["name"] + '|'
 				end
 			end
-			# construct the path and 
+			# construct the path and
 			if isParentCollection
 				k = "#{parentPath}/<#{ids.chomp('|')}>".chomp('/<>')
 			else
-				k = parentPath				
+				k = parentPath
 			end
-			object["restPath"][k] = true 
-			File.open(fullpath, "w") do |f|
-				f.write(JSON.pretty_generate object, :encoding => 'UTF-8')
-			end
+			object["restPath"][k] = true
 			return if object["properties"].length == 0
 			object["properties"].each do |item|
-				if item["isRelationship"] 
-					fill_rest_path("#{k}/#{item["name"]}", item["dataType"], item["isCollection"])
-				end				
+				if item["isRelationship"]
+					fill_rest_path_internal("#{k}/#{item["name"]}", item["dataType"], item["isCollection"], jsonCache)
+				end
 			end
 			return
 		else
 			return
-		end	
-		
+		end
 
 	end
 
