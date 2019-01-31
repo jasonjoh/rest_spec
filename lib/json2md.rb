@@ -155,7 +155,7 @@ module SpecMaker
       end
       example_lines.push '```http' + NEWLINE
       example_lines.push 'HTTP/1.1 200 OK' + NEWLINE
-      if method[:returnType].nil? && method[:returnType] != 'None'
+      if !method[:returnType].nil? && method[:returnType] != 'None'
         modeldump = get_json_model_method(method[:returnType], method[:isReturnTypeCollection])
         example_lines.push 'Content-type: application/json' + NEWLINE
         example_lines.push modeldump + NEWLINE
@@ -172,7 +172,7 @@ module SpecMaker
   end
 
   def self.top_one_rest_path
-    arr = @json_hash[:restPath].select { |_, v| v }.keyssort_by(&:length)
+    arr = @json_hash[:restPath].select { |_, v| v }.keys.sort_by(&:length)
     arr[0..0]
   end
 
@@ -197,7 +197,7 @@ module SpecMaker
       http_method = method && method[:isFunction] ? 'GET' : 'POST'
 
       # identify the functional path
-      if method && method[:isFunction] && !method[:parameters].empty? > 0
+      if method && method[:isFunction] && !method[:parameters].empty?
         q = ''
         method[:parameters].each do |item|
           q = q + item[:name] + "=#{item[:name]}-value, "
@@ -293,7 +293,7 @@ module SpecMaker
     # Cannot detect from metadata, so skip
 
     # Function parameters
-    if method[:isFunction] && !method[:parameters].nil? && method[:parameters].empty?
+    if method[:isFunction] && !method[:parameters].nil? && !method[:parameters].empty?
       action_lines.push HEADER2 + 'Function parameters' + TWONEWLINES
       action_lines.push 'In the request URL, provide following query parameters with values.' + TWONEWLINES
       action_lines.push PARAM_HEADER + TABLE_2ND_LINE
@@ -327,7 +327,7 @@ module SpecMaker
     action_lines.push HEADER2 + 'Request body' + TWONEWLINES
 
     # Provide parameters:
-    if !method[:isFunction] && !method[:parameters].nil? && method[:parameters].empty?
+    if !method[:isFunction] && !method[:parameters].nil? && !method[:parameters].empty?
       action_lines.push 'In the request body, provide a JSON object with the following parameters.' + TWONEWLINES
       action_lines.push PARAM_HEADER + TABLE_2ND_LINE
       method[:parameters].each do |param|
