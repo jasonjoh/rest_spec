@@ -302,9 +302,9 @@ module SpecMaker
         # Append optional and enum possible values (if applicable).
         final_param_desc = param[:isRequired] ? param[:description] : 'Optional. ' + param[:description]
 
-        if (param[:enumName] != nil) && (@enumHash.key? param[:enumName])
+        if (!param[:enumName].nil?) && (@enumHash.key? param[:enumName])
           append_enum = ' Possible values are: `' + @enumHash[param[:enumName]]['options'].keys.join('`, `') + '`.'
-          final_param_desc = final_param_desc + append_enum
+          final_param_desc += append_enum
         end
         action_lines.push PIPE + param[:name] + PIPE + param[:dataType] + PIPE + final_param_desc + PIPE + NEWLINE
       end
@@ -334,9 +334,9 @@ module SpecMaker
         # Append optional and enum possible values (if applicable).
         final_param_desc = param[:isRequired] ? param[:description] : 'Optional. ' + param[:description]
 
-        if (param[:enumName] != nil) && (@enumHash.key? param[:enumName])
+        if (!param[:enumName].nil?) && (@enumHash.key? param[:enumName])
           append_enum = ' Possible values are: `' + @enumHash[param[:enumName]]['options'].keys.join('`, `') + '`.'
-          final_param_desc = final_param_desc + append_enum
+          final_param_desc += append_enum
         end
         action_lines.push PIPE + param[:name] + PIPE + param[:dataType] + PIPE + final_param_desc + PIPE + NEWLINE
       end
@@ -367,7 +367,7 @@ module SpecMaker
       action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code. It does not return anything in the response body."  + NEWLINE
     else
       true_return = data_type_plus_link
-      true_return = true_return + ' collection' if method[:isReturnTypeCollection]
+      true_return += ' collection' if method[:isReturnTypeCollection]
       action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code and #{true_return} object in the response body."  + NEWLINE
     end
 
@@ -405,7 +405,7 @@ module SpecMaker
     action_lines.each do |line|
       file.write line
     end
-    @method_files_created = @method_files_created + 1
+    @method_files_created += 1
   end
 
   def self.create_get_method(path_append = nil, file_name_override = nil)
@@ -547,7 +547,7 @@ module SpecMaker
     get_method_lines.each do |line|
       file.write line
     end
-    @get_list_files_created = @get_list_files_created + 1
+    @get_list_files_created += 1
   end
 
   def self.create_patch_method(properties = [])
@@ -595,7 +595,7 @@ module SpecMaker
     properties.each do |prop|
       if !prop[:isReadOnly]
            final_desc = prop[:description]
-        if (prop[:enumName] != nil) && (@enumHash.key? prop[:enumName])
+        if (!prop[:enumName].nil?) && (@enumHash.key? prop[:enumName])
           append_enum = ' Possible values are: `' + @enumHash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
           final_desc += append_enum
         end
@@ -623,7 +623,7 @@ module SpecMaker
     patch_method_lines.each do |line|
       file.write line
     end
-    @patch_files_created = @patch_files_created + 1
+    @patch_files_created += 1
 
   end
 
@@ -634,7 +634,7 @@ module SpecMaker
     @json_hash = JSON.parse(item, {symbolize_names: true})
 
     if @json_hash[:isEntitySet]
-      @ientityset = @ientityset + 1
+      @ientityset += 1
       @serviceroot.push @json_hash
       return
     end
@@ -649,7 +649,7 @@ module SpecMaker
     end
 
     methods = @json_hash[:methods]
-    if methods != nil && methods.length > 1
+    if !methods.nil? && methods.length > 1
       methods = methods.sort_by { |v| v[:name] }
     end
 
@@ -755,7 +755,7 @@ module SpecMaker
               @json_hash[:collectionOf] = prop[:dataType]
               create_get_method(prop[:name], file_name)
               @json_hash = deep_copy save_json_hash
-              @list_from_rel = @list_from_rel + 1
+              @list_from_rel += 1
             end
 
           end
@@ -875,7 +875,7 @@ module SpecMaker
     @mdlines.each do |line|
       file.write line
     end
-    @resources_files_created = @resources_files_created + 1
+    @resources_files_created += 1
 
   end
 
@@ -967,7 +967,7 @@ module SpecMaker
 
     if File.file?(fullpath)
       convert_to_spec File.read(fullpath, encoding: 'UTF-8')
-      processed_files = processed_files + 1
+      processed_files += 1
     end
   end
   create_service_root
