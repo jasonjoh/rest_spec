@@ -365,10 +365,10 @@ module SpecMaker
       data_type_plus_link = 'none'
     end
 
-    if method[:returnType].nil? || method[:returnType] ==  'None'
-      action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code. It does not return anything in the response body."  + NEWLINE
+    if method[:returnType].nil? || method[:returnType] == 'None'
+      action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code. It does not return anything in the response body." + NEWLINE
     else
-      action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code and #{data_type_plus_link} object in the response body."  + NEWLINE
+      action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code and #{data_type_plus_link} object in the response body." + NEWLINE
     end
 
     # Write example files
@@ -399,7 +399,7 @@ module SpecMaker
 
     outfile = MARKDOWN_API_FOLDER + file_name
 
-    file = File.new(outfile,'w')
+    file = File.new(outfile, 'w')
     action_lines.each do |line|
       file.write line
     end
@@ -413,9 +413,9 @@ module SpecMaker
     get_method_lines.push HEADER1 + real_header + TWONEWLINES
 
     if @json_hash[:collectionOf]
-      get_method_lines.push "Retrieve a list of #{@json_hash[:collectionOf].downcase} objects."  + TWONEWLINES
+      get_method_lines.push "Retrieve a list of #{@json_hash[:collectionOf].downcase} objects." + TWONEWLINES
     else
-      get_method_lines.push "Retrieve the properties and relationships of #{@json_hash[:name].downcase} object."  + TWONEWLINES
+      get_method_lines.push "Retrieve the properties and relationships of #{@json_hash[:name].downcase} object." + TWONEWLINES
     end
 
     get_method_lines.push PREREQ
@@ -431,7 +431,7 @@ module SpecMaker
                   end
 
     get_method_lines.push http_syntax.join(NEWLINE) + NEWLINE
-    get_method_lines.push  '```' + TWONEWLINES
+    get_method_lines.push '```' + TWONEWLINES
 
     # Query parameters
     get_method_lines.push HEADER2 + 'Optional query parameters' + TWONEWLINES
@@ -513,9 +513,9 @@ module SpecMaker
     # Response body
     get_method_lines.push HEADER2 + 'Response' + TWONEWLINES
     if @json_hash[:collectionOf]
-      get_method_lines.push "If successful, this method returns a `200 OK` response code and collection of [#{@json_hash[:collectionOf]}](../resources/#{sanitize_file_name(@json_hash[:collectionOf].downcase)}.md) objects in the response body."  + TWONEWLINES
+      get_method_lines.push "If successful, this method returns a `200 OK` response code and collection of [#{@json_hash[:collectionOf]}](../resources/#{sanitize_file_name(@json_hash[:collectionOf].downcase)}.md) objects in the response body." + TWONEWLINES
     else
-      get_method_lines.push "If successful, this method returns a `200 OK` response code and [#{@json_hash[:name]}](../resources/#{sanitize_file_name(@json_hash[:name].downcase)}.md) object in the response body."  + TWONEWLINES
+      get_method_lines.push "If successful, this method returns a `200 OK` response code and [#{@json_hash[:name]}](../resources/#{sanitize_file_name(@json_hash[:name].downcase)}.md) object in the response body." + TWONEWLINES
     end
 
     # Example
@@ -541,7 +541,7 @@ module SpecMaker
                 MARKDOWN_API_FOLDER + file_name
               end
 
-    file = File.new(outfile,'w')
+    file = File.new(outfile, 'w')
     get_method_lines.each do |line|
       file.write line
     end
@@ -556,15 +556,15 @@ module SpecMaker
     h1name = if @json_hash[:updateDescription].empty?
                "Update #{@json_hash[:name].downcase}"
              else
-               "#{@json_hash[:updateDescription]}"
+               @json_hash[:updateDescription].to_s
              end
 
     patch_method_lines.push HEADER1 + h1name + TWONEWLINES
 
     if @json_hash[:updateDescription].empty?
-      patch_method_lines.push "Update the properties of #{@json_hash[:name].downcase} object."  + TWONEWLINES
+      patch_method_lines.push "Update the properties of #{@json_hash[:name].downcase} object." + TWONEWLINES
     else
-      patch_method_lines.push "#{@json_hash[:updateDescription]}"  + TWONEWLINES
+      patch_method_lines.push "#{@json_hash[:updateDescription]}#{TWONEWLINES}"
     end
 
     patch_method_lines.push PREREQ
@@ -577,13 +577,13 @@ module SpecMaker
 
     http_syntax = get_syntax('auto_patch', top_rest_path)
     patch_method_lines.push http_syntax.join(NEWLINE) + NEWLINE
-    patch_method_lines.push  '```' + TWONEWLINES
+    patch_method_lines.push '```' + TWONEWLINES
 
     # Request headers
     patch_method_lines.push HEADER2 + 'Request headers' + TWONEWLINES
     patch_method_lines.push '| Name       | Description|' + NEWLINE
     patch_method_lines.push '|:-----------|:-----------|' + NEWLINE
-    patch_method_lines.push HTTP_HEADER_SAMPLE  + TWONEWLINES
+    patch_method_lines.push HTTP_HEADER_SAMPLE + TWONEWLINES
 
     # Request body
     patch_method_lines.push HEADER2 + 'Request body' + TWONEWLINES
@@ -591,20 +591,20 @@ module SpecMaker
 
     patch_method_lines.push PROPERTY_HEADER + TABLE_2ND_LINE
     properties.each do |prop|
-      if !prop[:isReadOnly]
-           final_desc = prop[:description]
+      unless prop[:isReadOnly]
+        final_desc = prop[:description]
         if !prop[:enumName].nil? && @enumHash.key?(prop[:enumName])
           append_enum = ' Possible values are: `' + @enumHash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
           final_desc += append_enum
         end
-        patch_method_lines.push PIPE + prop[:name] + PIPE + prop[:dataType]  + PIPE + final_desc + PIPE + NEWLINE
+        patch_method_lines.push PIPE + prop[:name] + PIPE + prop[:dataType] + PIPE + final_desc + PIPE + NEWLINE
       end
     end
     patch_method_lines.push NEWLINE
 
     # Response body
     patch_method_lines.push HEADER2 + 'Response' + TWONEWLINES
-    patch_method_lines.push "If successful, this method returns a `200 OK` response code and updated [#{@json_hash[:name]}](../resources/#{sanitize_file_name(@json_hash[:name].downcase)}.md) object in the response body."  + TWONEWLINES
+    patch_method_lines.push "If successful, this method returns a `200 OK` response code and updated [#{@json_hash[:name]}](../resources/#{sanitize_file_name(@json_hash[:name].downcase)}.md) object in the response body." + TWONEWLINES
 
     # Example
     example_lines = gen_example('auto_patch')
@@ -617,7 +617,7 @@ module SpecMaker
     # Write the output file.
     file_name = "#{sanitize_file_name(@json_hash[:name].downcase)}-update.md"
     outfile = MARKDOWN_API_FOLDER + file_name
-    file = File.new(outfile,'w')
+    file = File.new(outfile, 'w')
     patch_method_lines.each do |line|
       file.write line
     end
@@ -659,17 +659,16 @@ module SpecMaker
     is_relation, is_property, is_method, patchable = false
 
     properties.each do |prop|
-      if !prop[:isRelationship]
-         is_property = true
-         if !prop[:isReadOnly] && @json_hash[:allowPatch]
-             patchable = true
-         end
-      end
       if prop[:isRelationship]
-         is_relation = true
-         if prop[:isCollection] && prop[:allowPostToCollection]
-             is_post = true
-         end
+        is_relation = true
+        if prop[:isCollection] && prop[:allowPostToCollection]
+            is_post = true
+        end
+      else
+        is_property = true
+        if !prop[:isReadOnly] && @json_hash[:allowPatch]
+            patchable = true
+        end
       end
     end
 
@@ -678,13 +677,13 @@ module SpecMaker
     end
 
     # Add method table.
-    if !@json_hash[:isComplexType]
+    unless @json_hash[:isComplexType]
       @mdlines.push HEADER2 + 'Methods' + TWONEWLINES
 
       if is_method || is_property || is_post || @json_hash[:allowDelete]
         @mdlines.push TASKS_HEADER + TABLE_2ND_LINE
       end
-      if !@json_hash[:isComplexType]
+      unless @json_hash[:isComplexType]
         if @json_hash[:collectionOf]
           return_link = '[' + @json_hash[:collectionOf] + '](' + sanitize_file_name(@json_hash[:collectionOf].downcase) + '.md)'
           @mdlines.push "|[List](../api/#{sanitize_file_name(@json_hash[:collectionOf].downcase)}-list.md) | #{return_link} collection |Get #{uncapitalize @json_hash[:collectionOf]} object collection. |" + NEWLINE
@@ -740,13 +739,13 @@ module SpecMaker
             end
 
             # Add List method.
-            if !SIMPLETYPES.include? prop[:dataType]
+            unless SIMPLETYPES.include? prop[:dataType]
               # file_name = "#{prop[:dataType].downcase}_list.md"
 
               file_name = sanitize_file_name("#{@json_hash[:name]}-list-#{prop[:name]}.md".downcase)
               list_link = "../api/#{file_name}"
 
-              # puts "$----> #{file_name} #{@json_hash[:name]},, #{prop[:name]}"
+              # puts "$----> #{file_name} #{@json_hash[:name]}, #{prop[:name]}"
               @mdlines.push "| [List #{prop[:name]}](#{list_link}) | #{return_link} collection | Get a #{use_name} object collection. |" + NEWLINE
               save_json_hash = deep_copy @json_hash
               @json_hash[:name] = prop[:name]
@@ -798,11 +797,11 @@ module SpecMaker
       end
 
       if !is_property && !is_method && !is_post
-        @mdlines.push 'None'  + TWONEWLINES
+        @mdlines.push 'None' + TWONEWLINES
       end
 
-      if !@json_hash[:methodNotes].empty?
-        @mdlines.push NEWLINE + ALERT_NOTE + "#{@json_hash[:methodNotes]}" + TWONEWLINES
+      unless @json_hash[:methodNotes].empty?
+        @mdlines.push NEWLINE + ALERT_NOTE + @json_hash[:methodNotes].to_s + TWONEWLINES
       end
     end
 
@@ -812,20 +811,20 @@ module SpecMaker
     if is_property
       @mdlines.push PROPERTY_HEADER + TABLE_2ND_LINE
       properties.each do |prop|
-        if !prop[:isRelationship]
+        unless prop[:isRelationship]
            push_property prop
         end
       end
       @mdlines.push NEWLINE
-      if !@json_hash[:propertyNotes].empty?
-        @mdlines.push NEWLINE + ALERT_NOTE + "#{@json_hash[:propertyNotes]}" + TWONEWLINES
+      unless @json_hash[:propertyNotes].empty?
+        @mdlines.push NEWLINE + ALERT_NOTE + @json_hash[:propertyNotes].to_s + TWONEWLINES
       end
     else
-      @mdlines.push 'None'  + TWONEWLINES
+      @mdlines.push 'None' + TWONEWLINES
     end
 
     # Add Relationship table.
-    if !@json_hash[:isComplexType]
+    unless @json_hash[:isComplexType]
       @mdlines.push HEADER2 + 'Relationships' + TWONEWLINES
       if is_relation
         @mdlines.push RELATIONSHIP_HEADER + TABLE_2ND_LINE
@@ -835,11 +834,11 @@ module SpecMaker
           end
         end
         @mdlines.push NEWLINE
-        if !@json_hash[:relationshipNotes].empty?
-          @mdlines.push NEWLINE + ALERT_NOTE + "#{@json_hash[:relationshipNotes]}" + TWONEWLINES
+        unless @json_hash[:relationshipNotes].empty?
+          @mdlines.push NEWLINE + ALERT_NOTE + @json_hash[:relationshipNotes].to_s + TWONEWLINES
         end
       else
-        @mdlines.push 'None'  + TWONEWLINES
+        @mdlines.push 'None' + TWONEWLINES
       end
     end
 
@@ -869,7 +868,7 @@ module SpecMaker
               else
                 MARKDOWN_RESOURCE_FOLDER + sanitize_file_name(@resource.downcase) + '.md'
               end
-    file = File.new(outfile,'w')
+    file = File.new(outfile, 'w')
     @mdlines.each do |line|
       file.write line
     end
@@ -923,7 +922,7 @@ module SpecMaker
     service_lines.push NEWLINE + uuid_date + NEWLINE
     service_lines.push get_json_page_annotation('Service root')
     outfile = MARKDOWN_RESOURCE_FOLDER + 'service-root.md'
-    file = File.new(outfile,'w')
+    file = File.new(outfile, 'w')
     service_lines.each do |line|
       file.write line
     end
