@@ -1,5 +1,8 @@
-/data/metadata.json
-/jsonFiles/*
+data/
+jsonFiles/
 !/jsonFiles/template
-/logs/*
-/markdowns/*
+logs/
+markdown/
+markdowns/
+markdowns-original/
+.vscode/

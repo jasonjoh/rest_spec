@@ -2,26 +2,35 @@ require 'FileUtils'
 
 module SpecMaker
 	# Initialize
-	JSON_BASE_FOLDER = "../jsonFiles/"
-	JSON_SOURCE_FOLDER = "../jsonFiles/rest/"
-	ENUMS = JSON_BASE_FOLDER + '/settings/restenums.json'
-	MARKDOWN_BASE_FOLDER = "../markdowns/"
-	MARKDOWN_RESOURCE_FOLDER = "../markdowns/resources/"
-	MARKDOWN_API_FOLDER = "../markdowns/api/"
+	JSON_BASE_FOLDER = "../jsonFiles/#{$options[:version]}/"
+	JSON_SOURCE_FOLDER = JSON_BASE_FOLDER + 'rest/'
+	JSON_SETTINGS_FOLDER = JSON_BASE_FOLDER + 'settings/'
+	ENUMS = JSON_SETTINGS_FOLDER + 'restenums.json'
+	ACTIONS = JSON_BASE_FOLDER + 'actions.json'
+	ANNOTATIONS = JSON_SETTINGS_FOLDER + 'annotations.json'
+
+	MARKDOWN_BASE_FOLDER = "../markdown/#{$options[:version]}/"
+	MARKDOWN_RESOURCE_FOLDER = MARKDOWN_BASE_FOLDER + "resources/"
+	MARKDOWN_API_FOLDER = MARKDOWN_BASE_FOLDER + "api/"
 	EXAMPLES_FOLDER = JSON_SOURCE_FOLDER + "examples/"
-	JSON_EXAMPLE_FOLDER = "../jsonFiles/examples/"
-	ANNOTATIONS = JSON_BASE_FOLDER + 'settings/annotations.json'
-	SERVER = 'https://graph.microsoft.com/v1.0'
+	JSON_EXAMPLE_FOLDER = JSON_BASE_FOLDER + 'examples/'
+	SERVER = "https://graph.microsoft.com/#{$options[:version]}"
 	HEADER1 = '# '
 	HEADER2 = '## '
 	HEADER3 = '### '
 	HEADER4 = '#### '
 	HEADER5 = '##### '
-	BACKTOMETHOD = '[Back](#methods)'
+	#BACKTOMETHOD = '[Back](#methods)'
 	NEWLINE = "\n"
-	BACKTOPROPERTY = NEWLINE + '[Back](#properties)'
+	#BACKTOPROPERTY = NEWLINE + '[Back](#properties)'
 	PIPE = '|'
 	TWONEWLINES = "\n\n"
+
+	# Alert styles
+	ALERT_NOTE = "> **Note:** "
+	ALERT_IMPORTANT = "> **Important:** "
+	# ALERT_NOTE = "> [!NOTE]\n> "
+	# ALERT_IMPORTANT = "> [!IMPORTANT]\n> "
 
 	TABLE_2ND_LINE =       "|:-------------|:------------|:------------|" + NEWLINE
 	PROPERTY_HEADER =      "| Property     | Type        | Description |" + NEWLINE
@@ -33,13 +42,14 @@ module SpecMaker
 	HTTP_HEADER =          "| Name          | Description   |" + NEWLINE
 	# HTTP_HEADER_SAMPLE = "| Authorization | Bearer {code} |" + NEWLINE + "| Workbook-Session-Id  | Workbook session Id that determines if changes are persisted or not. Optional.|"
 	HTTP_HEADER_SAMPLE =   "| Authorization | Bearer {code} |"
+	ENUM_HEADER =          "| Member       | Value       |" + NEWLINE
 
-	PREREQ = HEADER2 + "Permissions" + NEWLINE + "One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](../../../concepts/permissions_reference.md)." + NEWLINE + NEWLINE + \
-			"|Permission type                        | Permissions (from least to most privileged)              |" + NEWLINE + \
-			"|:--------------------------------------|:---------------------------------------------------------|" + NEWLINE + \
+	PREREQ = HEADER2 + "Permissions" + TWONEWLINES + "One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](/graph/permissions-reference)." + TWONEWLINES + \
+			"|Permission type                        | Permissions (from least to most privileged) |" + NEWLINE + \
+			"|:--------------------------------------|:--------------------------------------------|" + NEWLINE + \
 			"|Delegated (work or school account)     | Not supported. |" + NEWLINE + \
 			"|Delegated (personal Microsoft account) | Not supported. |" + NEWLINE + \
-			"|Application                            | Not supported. |" + NEWLINE + NEWLINE
+			"|Application                            | Not supported. |" + TWONEWLINES
 
 	QRY_HEADER = "|Name|Value|Description|"
 	QRY_2nd_LINE = "|:---------------|:--------|:-------|"
@@ -111,10 +121,10 @@ module SpecMaker
 
 	# Log file
 	LOG_FOLDER = '../logs'
-	Dir.mkdir(LOG_FOLDER) unless File.exists?(LOG_FOLDER)
+	Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
 	LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
-	if File.exists?("#{LOG_FOLDER}/#{LOG_FILE}")
+	if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
 		File.delete("#{LOG_FOLDER}/#{LOG_FILE}")
 	end
 	@logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
@@ -122,13 +132,13 @@ module SpecMaker
 	# End log file
 
 #
+	Dir.mkdir("../markdown") unless File.exist?("../markdown")
+	Dir.mkdir(MARKDOWN_BASE_FOLDER) unless File.exist?(MARKDOWN_BASE_FOLDER)
 
-	Dir.mkdir(MARKDOWN_BASE_FOLDER) unless File.exists?(MARKDOWN_BASE_FOLDER)
-
-	Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exists?(MARKDOWN_RESOURCE_FOLDER)
+	Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exist?(MARKDOWN_RESOURCE_FOLDER)
 	FileUtils.rm Dir.glob(MARKDOWN_RESOURCE_FOLDER + '/*')
 
-	Dir.mkdir(MARKDOWN_API_FOLDER) unless File.exists?(MARKDOWN_API_FOLDER)
+	Dir.mkdir(MARKDOWN_API_FOLDER) unless File.exist?(MARKDOWN_API_FOLDER)
 	FileUtils.rm Dir.glob(MARKDOWN_API_FOLDER + '/*')
 
 #
@@ -151,14 +161,14 @@ module SpecMaker
 
 
 	# Create markdown folder if it doesn't already exist
-	Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exists?(MARKDOWN_RESOURCE_FOLDER)
+	Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exist?(MARKDOWN_RESOURCE_FOLDER)
 
-	if !File.exists?(JSON_SOURCE_FOLDER)
+	if !File.exist?(JSON_SOURCE_FOLDER)
 		@logger.fatal("JSON Resource File folder does not exist. Aborting")
 		abort("*** FATAL ERROR *** Input JSON resource folder: #{JSON_SOURCE_FOLDER} doesn't exist. Correct and re-run." )
 	end
 
-	if !File.exists?(EXAMPLES_FOLDER)
+	if !File.exist?(EXAMPLES_FOLDER)
 		@logger.warn("API examples folder does not exist")
 	end
 
@@ -234,18 +244,27 @@ module SpecMaker
 		model={}
 		fullpath = JSON_SOURCE_FOLDER + '/' + ct.downcase + '.json'
 		if File.file?(fullpath)
-			object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
-			object[:properties].each do |item|
-				if item[:name].downcase.start_with?('extension')
-					next
-					#model[item[:name]] = {}
-				else
-					model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship])
-					if item[:isCollection]
-						model[item[:name]] = [model[item[:name]]]
+			begin
+				object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
+				object[:properties].each do |item|
+					if item[:name].downcase.start_with?('extension')
+						next
+						#model[item[:name]] = {}
+					else
+						model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship])
+						if item[:isCollection]
+							if model[item[:name]].empty?
+								model[item[:name]] = []
+							else
+								model[item[:name]] = [model[item[:name]]]
+							end
+						end
 					end
+					# end
 				end
-				# end
+			rescue SystemStackError => err
+				# TEMP
+				model[:err] = "SystemStackError"
 			end
 		end
 
@@ -253,6 +272,10 @@ module SpecMaker
 	end
 
 	def self.assign_value2 (dataType=nil, name='', isRel=false)
+
+		if isRel
+			return {}
+		end
 
 		if dataType.downcase.start_with?('extension')
 			return {}
@@ -318,7 +341,7 @@ module SpecMaker
 		if isOpenType && openTypeReq
 			model = { "#{objectName}" => model }
 		end
-		return JSON.pretty_generate model
+		return JSON.pretty_generate model, { :max_nesting => false }
 	end
 
 	def self.get_json_model_params(params=[])
@@ -331,7 +354,8 @@ module SpecMaker
 				model[item[:name]] = [model[item[:name]]]
 			end
 		end
-		return JSON.pretty_generate model
+
+		return JSON.pretty_generate model, { :max_nesting => false }
 	end
 
 	def self.get_json_model (properties=[])
@@ -366,15 +390,20 @@ module SpecMaker
 		return JSON.pretty_generate model
 	end
 
-	def self.get_json_model_pretext (objectName="", properties=[])
+	def self.get_json_model_pretext (objectName="", properties=[], baseType="")
 		model = deep_copy(@mdresource)
 		model["@odata.type"] = "#{@service[:namespace]}.#{objectName}"
+		model["baseType"] = baseType
 		properties.each do |item|
 
 			next if item[:isRelationship]
 
 			if item[:isNullable] || item[:isRelationship]
 				model[:optionalProperties].push item[:name]
+			end
+
+			if item[:isKey]
+				model["keyProperty"] = item[:name]
 			end
 		end
 		return "<!-- " + (JSON.pretty_generate model) + "-->"
@@ -430,6 +459,10 @@ module SpecMaker
 			model[:isCollection] = true if isArray
 		end
 		return "<!-- " + (JSON.pretty_generate model) + " -->"
+	end
+
+	def self.sanitize_file_name (fileName)
+		return fileName.gsub('_', '-')
 	end
 
 # module end

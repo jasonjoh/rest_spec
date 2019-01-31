@@ -12,6 +12,7 @@
   "object": {
     "name": null,
     "description": "",
+    "baseType": "",
     "collectionOf": null,
     "isComplexType": false,
     "isEntitySet": false,
@@ -19,7 +20,7 @@
     "allowPatch": true,
     "allowUpsert": true,
     "allowPatchCreate": true,
-    "allowDelete": true,  
+    "allowDelete": true,
     "isReferenceable": true,
     "isExpandable": true,
     "isFilterable": true,
@@ -38,7 +39,7 @@
     "restPath": {},
     "properties": [],
     "methods": []
-  },  
+  },
 
   "property": {
     "name": null,
@@ -105,7 +106,7 @@
     "blockType": "response",
     "truncated": true
   },
-  
+
   "mdignore": {
     "blockType": "ignored"
   },

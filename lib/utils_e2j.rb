@@ -2,17 +2,19 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'json'
 require 'logger'
-# require 'FileUtils'
-module SpecMaker
-	JSON_BASE_FOLDER = "../jsonFiles/"
-	JSON_SOURCE_FOLDER = "../jsonFiles/rest/"
-	JSON_SETTINGS_FOLDER = "../jsonFiles/settings/"
-	JSON_PREV_SOURCE_FOLDER = "../jsonFiles/rest_previous/"
-	ENUMS = JSON_BASE_FOLDER + 'settings/restenums.json'
-	ANNOTATIONS = JSON_BASE_FOLDER + 'settings/annotations.json'
-	CSDL_LOCATION = "../data/"
+# require 'FileUtils'
 
-	JSON_EXAMPLE_FOLDER = "../jsonFiles/examples/"
+module SpecMaker
+	JSON_BASE_FOLDER = "../jsonFiles/#{$options[:version]}/"
+	JSON_SOURCE_FOLDER = JSON_BASE_FOLDER + 'rest/'
+	JSON_SETTINGS_FOLDER = JSON_BASE_FOLDER + 'settings/'
+	JSON_PREV_SOURCE_FOLDER = JSON_BASE_FOLDER + 'rest_previous/'
+	ENUMS = JSON_SETTINGS_FOLDER + 'restenums.json'
+	ACTIONS = JSON_BASE_FOLDER + 'actions.json'
+	ANNOTATIONS = JSON_SETTINGS_FOLDER + 'annotations.json'
+	CSDL_LOCATION = "../data/#{$options[:version]}/"
+
+	JSON_EXAMPLE_FOLDER = JSON_BASE_FOLDER + 'examples/'
 	BASETYPES = %w[Entity directoryObject Attachment Message OutlookItem Extension]
 	BASETYPES_ALLCASE = BASETYPES.concat BASETYPES.map(&:downcase)
 
@@ -37,23 +39,27 @@ module SpecMaker
 	@template = @struct[:object]
 	@service = @struct[:serviceSettings]
 
+	Dir.mkdir(JSON_BASE_FOLDER) unless File.exist?(JSON_BASE_FOLDER)
+	Dir.mkdir(CSDL_LOCATION) unless File.exist?(CSDL_LOCATION)
+
 #
-	Dir.mkdir(JSON_SOURCE_FOLDER) unless File.exists?(JSON_SOURCE_FOLDER)
+	Dir.mkdir(JSON_SOURCE_FOLDER) unless File.exist?(JSON_SOURCE_FOLDER)
 	FileUtils.rm Dir.glob(JSON_SOURCE_FOLDER + '/*')
-	Dir.mkdir(JSON_SETTINGS_FOLDER) unless File.exists?(JSON_SETTINGS_FOLDER)
+	Dir.mkdir(JSON_SETTINGS_FOLDER) unless File.exist?(JSON_SETTINGS_FOLDER)
 #
 
 # Log file
 	LOG_FOLDER = '../logs'
-	Dir.mkdir(LOG_FOLDER) unless File.exists?(LOG_FOLDER)
+	Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
 	LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
-	if File.exists?("#{LOG_FOLDER}/#{LOG_FILE}")
+	if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
 		File.delete("#{LOG_FOLDER}/#{LOG_FILE}")
 	end
 	@logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
 	@logger.level = Logger::DEBUG
-# End log file
+# End log file
+
 	@iprop = 0
 	@ienums = 0
 	@inprop = 0
@@ -325,7 +331,7 @@ module SpecMaker
 			prop[:isUnicode] = false
 		end
 		@inprop = @inprop + 1
-		
+
 		annotationTarget = className + "/" + item[:Name]
 		parse_annotations(annotationTarget, item[:Annotation])
 		set_description(annotationTarget, prop)
@@ -469,7 +475,7 @@ module SpecMaker
 			end
 			# construct the path and
 			if isParentCollection
-				k = "#{parentPath}/<#{ids.chomp('|')}>".chomp('/<>')
+				k = "#{parentPath}/{#{ids.chomp('|')}}".chomp('/{}')
 			else
 				k = parentPath
 			end
