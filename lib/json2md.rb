@@ -658,7 +658,7 @@ module SpecMaker
     @mdlines.push "#{@json_hash[:description].empty? ? 'PROVIDE DESCRIPTION HERE' : @json_hash[:description]}#{TWONEWLINES}"
 
     # Determine if there is/are: relations, properties and methods.
-    is_relation, is_property, isMethod, patchable = false
+    is_relation, is_property, is_method, patchable = false
 
     properties.each do |prop|
       if !prop[:isRelationship]
@@ -676,24 +676,24 @@ module SpecMaker
     end
 
     if methods
-      isMethod = true
+      is_method = true
     end
 
     # Add method table.
     if !@json_hash[:isComplexType]
       @mdlines.push HEADER2 + 'Methods' + TWONEWLINES
 
-      if isMethod || is_property || is_post || @json_hash[:allowDelete]
+      if is_method || is_property || is_post || @json_hash[:allowDelete]
         @mdlines.push TASKS_HEADER + TABLE_2ND_LINE
       end
       if !@json_hash[:isComplexType]
         if @json_hash[:collectionOf]
-          returnLink = '[' + @json_hash[:collectionOf] + '](' + sanitize_file_name(@json_hash[:collectionOf].downcase) + '.md)'
-          @mdlines.push "|[List](../api/#{sanitize_file_name(@json_hash[:collectionOf].downcase)}-list.md) | #{returnLink} collection |Get #{uncapitalize @json_hash[:collectionOf]} object collection. |" + NEWLINE
+          return_link = '[' + @json_hash[:collectionOf] + '](' + sanitize_file_name(@json_hash[:collectionOf].downcase) + '.md)'
+          @mdlines.push "|[List](../api/#{sanitize_file_name(@json_hash[:collectionOf].downcase)}-list.md) | #{return_link} collection |Get #{uncapitalize @json_hash[:collectionOf]} object collection. |" + NEWLINE
         else
           if is_property
-            returnLink = '[' + @json_hash[:name] + '](' + @json_hash[:name].downcase + '.md)'
-            @mdlines.push "| [Get #{@json_hash[:name]}](../api/#{sanitize_file_name(@json_hash[:name].downcase)}-get.md) | #{returnLink} | Read properties and relationships of #{uncapitalize @json_hash[:name]} object. |" + NEWLINE
+            return_link = '[' + @json_hash[:name] + '](' + @json_hash[:name].downcase + '.md)'
+            @mdlines.push "| [Get #{@json_hash[:name]}](../api/#{sanitize_file_name(@json_hash[:name].downcase)}-get.md) | #{return_link} | Read properties and relationships of #{uncapitalize @json_hash[:name]} object. |" + NEWLINE
           end
         end
         create_get_method
@@ -707,33 +707,33 @@ module SpecMaker
           if prop[:isRelationship] && prop[:isCollection] && prop[:allowPostToCollection]
             if SIMPLETYPES.include?(prop[:dataType]) ||
                 POST_NAME_MAPPING.include?(prop[:dataType].downcase)
-              useName = prop[:name].chomp('s')
-              postName = 'Create ' + useName
+              use_name = prop[:name].chomp('s')
+              post_name = 'Create ' + use_name
             else
-              useName = prop[:dataType]
-              postName = 'Create ' + useName
+              use_name = prop[:dataType]
+              post_name = 'Create ' + use_name
             end
             file_name = sanitize_file_name("#{@json_hash[:name].downcase}-post-#{prop[:name].downcase}.md")
-            postLink = "../api/#{file_name}"
+            post_link = "../api/#{file_name}"
             if SIMPLETYPES.include? prop[:dataType]
-              returnLink = prop[:dataType]
+              return_link = prop[:dataType]
             else
-              returnLink = '[' + prop[:dataType] + '](' + sanitize_file_name(prop[:dataType].downcase) + '.md)'
+              return_link = '[' + prop[:dataType] + '](' + sanitize_file_name(prop[:dataType].downcase) + '.md)'
             end
-            @mdlines.push "| [#{postName}](#{postLink}) | #{returnLink} | Create a new #{useName} by posting to the #{prop[:name]} collection. |" + NEWLINE
+            @mdlines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{use_name} by posting to the #{prop[:name]} collection. |" + NEWLINE
             if File.exist?("#{MARKDOWN_API_FOLDER}/#{file_name}")
               puts 'POST create file already exists!'
             else
               mtd = deep_copy(@struct[:method])
 
               mtd[:name] = 'auto_post'
-              mtd[:displayName] = postName
+              mtd[:displayName] = post_name
               mtd[:returnType] = prop[:dataType]
-              createDescription = get_create_description(mtd[:returnType])
-              if createDescription.empty?
-                mtd[:description] = "Use this API to create a new #{useName}."
+              create_description = get_create_description(mtd[:returnType])
+              if create_description.empty?
+                mtd[:description] = "Use this API to create a new #{use_name}."
               else
-                mtd[:description] = createDescription
+                mtd[:description] = create_description
               end
 
               mtd[:parameters] = nil
@@ -746,15 +746,15 @@ module SpecMaker
               # file_name = "#{prop[:dataType].downcase}_list.md"
 
               file_name = sanitize_file_name("#{@json_hash[:name]}-list-#{prop[:name]}.md".downcase)
-              listLink = "../api/#{file_name}"
+              list_link = "../api/#{file_name}"
 
               # puts "$----> #{file_name} #{@json_hash[:name]},, #{prop[:name]}"
-              @mdlines.push "| [List #{prop[:name]}](#{listLink}) | #{returnLink} collection | Get a #{useName} object collection. |" + NEWLINE
-              saveJsonHash = deep_copy @json_hash
+              @mdlines.push "| [List #{prop[:name]}](#{list_link}) | #{return_link} collection | Get a #{use_name} object collection. |" + NEWLINE
+              save_json_hash = deep_copy @json_hash
               @json_hash[:name] = prop[:name]
               @json_hash[:collectionOf] = prop[:dataType]
               create_get_method(prop[:name], file_name)
-              @json_hash = deep_copy saveJsonHash
+              @json_hash = deep_copy save_json_hash
               @list_from_rel = @list_from_rel + 1
             end
 
@@ -763,8 +763,8 @@ module SpecMaker
       end
 
       if patchable
-        returnLink = '[' + @json_hash[:name] + '](' + sanitize_file_name(@json_hash[:name].downcase) + '.md)'
-        @mdlines.push "| [Update](../api/#{sanitize_file_name(@json_hash[:name].downcase)}-update.md) | #{returnLink} | Update #{@json_hash[:name]} object. |" + NEWLINE
+        return_link = '[' + @json_hash[:name] + '](' + sanitize_file_name(@json_hash[:name].downcase) + '.md)'
+        @mdlines.push "| [Update](../api/#{sanitize_file_name(@json_hash[:name].downcase)}-update.md) | #{return_link} | Update #{@json_hash[:name]} object. |" + NEWLINE
         create_patch_method properties
         # mtd = deep_copy(@struct[:method])
         # mtd[:name] = 'auto_patch'
@@ -792,14 +792,14 @@ module SpecMaker
         create_method_mdfile(mtd, "#{sanitize_file_name(@json_hash[:name].downcase)}-delete.md")
       end
 
-      if isMethod
+      if is_method
         methods.each do |method|
           push_method method
         end
         @mdlines.push NEWLINE
       end
 
-      if !is_property && !isMethod && !is_post
+      if !is_property && !is_method && !is_post
         @mdlines.push 'None'  + TWONEWLINES
       end
 
@@ -888,25 +888,25 @@ module SpecMaker
 
     @serviceroot.each do |item|
       if item[:collectionOf]
-        useName = item[:collectionOf]
-        postName = 'Create ' + useName
+        use_name = item[:collectionOf]
+        post_name = 'Create ' + use_name
         file_name = sanitize_file_name("#{item[:collectionOf].downcase}-post-#{item[:name].downcase}.md")
         puts "Service root file: #{file_name}"
-        postLink = "../api/#{file_name}"
-        returnLink = '[' + item[:collectionOf] + '](' + sanitize_file_name(item[:collectionOf].downcase) + '.md)'
-        service_lines.push "| [#{postName}](#{postLink}) | #{returnLink} | Create a new #{useName} by posting to the #{item[:name] } collection. |" + NEWLINE
+        post_link = "../api/#{file_name}"
+        return_link = '[' + item[:collectionOf] + '](' + sanitize_file_name(item[:collectionOf].downcase) + '.md)'
+        service_lines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{use_name} by posting to the #{item[:name] } collection. |" + NEWLINE
         if File.exist?("#{MARKDOWN_API_FOLDER}#{file_name}")
           puts 'EntitySet POST create file already exists!'
         else
           mtd = deep_copy(@struct[:method])
           mtd[:name] = 'auto_post'
-          mtd[:displayName] = postName
+          mtd[:displayName] = post_name
           mtd[:returnType] = item[:collectionOf]
-          createDescription = get_create_description(item[:collectionOf])
-          if createDescription.empty?
-            mtd[:description] = "Use this API to create a new #{useName}."
+          create_description = get_create_description(item[:collectionOf])
+          if create_description.empty?
+            mtd[:description] = "Use this API to create a new #{use_name}."
           else
-            mtd[:description] = createDescription
+            mtd[:description] = create_description
           end
           mtd[:parameters] = nil
           mtd[:httpSuccessCode] = '201'
@@ -915,8 +915,8 @@ module SpecMaker
         end
       end
       if item[:collectionOf]
-        returnLink = '[' + item[:collectionOf] + '](' + item[:collectionOf].downcase + '.md)'
-        service_lines.push "|[List #{item[:collectionOf]}](../api/#{sanitize_file_name(item[:collectionOf].downcase)}-list.md) | #{returnLink} collection |Get #{uncapitalize item[:collectionOf]} object collection. |" + NEWLINE
+        return_link = '[' + item[:collectionOf] + '](' + item[:collectionOf].downcase + '.md)'
+        service_lines.push "|[List #{item[:collectionOf]}](../api/#{sanitize_file_name(item[:collectionOf].downcase)}-list.md) | #{return_link} collection |Get #{uncapitalize item[:collectionOf]} object collection. |" + NEWLINE
         @json_hash = item
         create_get_method
       end
@@ -940,8 +940,8 @@ module SpecMaker
       enum_lines.push TABLE_2ND_LINE_2COL
 
       if value.key? 'options'
-        value['options'].each do |member, memVal|
-          enum_lines.push PIPE + member + PIPE + (memVal['value'].nil? ? '' : memVal['value']) + PIPE + NEWLINE
+        value['options'].each do |member, mem_val|
+          enum_lines.push PIPE + member + PIPE + (mem_val['value'].nil? ? '' : mem_val['value']) + PIPE + NEWLINE
         end
       else
         enum_lines.push PIPE + 'EMPTY ENUM?' + PIPE + PIPE + NEWLINE
