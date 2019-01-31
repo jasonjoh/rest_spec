@@ -248,7 +248,7 @@ module SpecMaker
 		return camelcase t[(t.rindex('.') + 1)..-1].chomp(')')
 	end
 
-	def self.merge_members(current=nil, base=nil, objectName=nil)
+	def self.merge_members(current=nil, base=nil)
 
 		# if objectName != nil
 		# 	if base.is_a?(Hash)
@@ -451,7 +451,6 @@ module SpecMaker
 	def self.fill_rest_path_internal (parentPath=nil, entity=nil, isParentCollection=true, jsonCache=nil)
 
 		fullpath = JSON_SOURCE_FOLDER + '/' + entity.downcase + '.json'
-		path={}
 		ids = ''
 
 		# append Id at the end.

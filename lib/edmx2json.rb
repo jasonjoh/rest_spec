@@ -205,8 +205,7 @@ module SpecMaker
 					@base_types[baseType.to_sym][:Property])
 				entity[:NavigationProperty]  = merge_members(
 					entity[:NavigationProperty],
-					@base_types[baseType.to_sym][:NavigationProperty],
-					entity[:Name])
+					@base_types[baseType.to_sym][:NavigationProperty])
 				@base_types[entity[:Name].to_sym] = deep_copy(entity)
 			end
 		end

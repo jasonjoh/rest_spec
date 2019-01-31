@@ -6,3 +6,4 @@ markdown/
 markdowns/
 markdowns-original/
 .vscode/
+lib/rubocop.txt

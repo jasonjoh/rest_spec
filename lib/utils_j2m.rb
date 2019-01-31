@@ -179,7 +179,7 @@ module SpecMaker
 
 	begin
 		@annotations = JSON.parse File.read(ANNOTATIONS, :encoding => 'UTF-8')
-	rescue => err
+	rescue
 		@logger.warn("JSON Annotations input file doesn't exist: #{@current_object}")
 	end
 
@@ -190,7 +190,7 @@ module SpecMaker
 
 	begin
 		@enumHash = JSON.parse File.read(ENUMS, :encoding => 'UTF-8')
-	rescue => err
+	rescue
 		@logger.warn("JSON Enumeration input file doesn't exist: #{@current_object}")
 	end
 
@@ -262,8 +262,7 @@ module SpecMaker
 					end
 					# end
 				end
-			rescue SystemStackError => err
-				# TEMP
+			rescue SystemStackError
 				model[:err] = "SystemStackError"
 			end
 		end
@@ -380,7 +379,7 @@ module SpecMaker
 			if item[:isKey]
 				model[item[:name]] = model[item[:name]] + ' (identifier)'
 			end
-			if %w['eTag', 'cTag', 'etag', 'ctag'].include?(item[:name])
+			if %w[eTag cTag etag ctag].include?(item[:name])
 				model[item[:name]] = model[item[:name]] + ' (etag)'
 			end
 			if item[:isCollection]
