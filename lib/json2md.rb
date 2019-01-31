@@ -302,7 +302,7 @@ module SpecMaker
         # Append optional and enum possible values (if applicable).
         final_param_desc = param[:isRequired] ? param[:description] : 'Optional. ' + param[:description]
 
-        if (!param[:enumName].nil?) && (@enumHash.key? param[:enumName])
+        if !param[:enumName].nil? && @enumHash.key?(param[:enumName])
           append_enum = ' Possible values are: `' + @enumHash[param[:enumName]]['options'].keys.join('`, `') + '`.'
           final_param_desc += append_enum
         end
@@ -334,7 +334,7 @@ module SpecMaker
         # Append optional and enum possible values (if applicable).
         final_param_desc = param[:isRequired] ? param[:description] : 'Optional. ' + param[:description]
 
-        if (!param[:enumName].nil?) && (@enumHash.key? param[:enumName])
+        if !param[:enumName].nil? && @enumHash.key?(param[:enumName])
           append_enum = ' Possible values are: `' + @enumHash[param[:enumName]]['options'].keys.join('`, `') + '`.'
           final_param_desc += append_enum
         end
@@ -354,11 +354,13 @@ module SpecMaker
     action_lines.push HEADER2 + 'Response' + TWONEWLINES
 
     if !method[:returnType].nil?
-      if SIMPLETYPES.include? method[:returnType]
-        data_type_plus_link = method[:returnType]
-      else
-        data_type_plus_link = '[' + method[:returnType] + '](../resources/' + sanitize_file_name(method[:returnType].downcase) + '.md)'
-      end
+      data_type_plus_link = if SIMPLETYPES.include?(method[:returnType]) || method[:returnType] == 'None'
+                              method[:returnType]
+                            else
+                              '[' + method[:returnType] + '](../resources/' + sanitize_file_name(method[:returnType].downcase) + '.md)'
+                            end
+
+      data_type_plus_link += ' collection' if method[:isReturnTypeCollection]
     else
       data_type_plus_link = 'none'
     end
@@ -366,23 +368,18 @@ module SpecMaker
     if method[:returnType].nil? || method[:returnType] ==  'None'
       action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code. It does not return anything in the response body."  + NEWLINE
     else
-      true_return = data_type_plus_link
-      true_return += ' collection' if method[:isReturnTypeCollection]
-      action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code and #{true_return} object in the response body."  + NEWLINE
+      action_lines.push "If successful, this method returns `#{method[:httpSuccessCode]}, #{HTTP_CODES[method[:httpSuccessCode]]}` response code and #{data_type_plus_link} object in the response body."  + NEWLINE
     end
 
     # Write example files
-    # begin
-    example_lines = []
-
-    case method[:name]
-    when 'auto_post'
-      example_lines = gen_example('auto_post', method, path_append)
-    when 'auto_delete'
-      example_lines = gen_example('auto_delete', method)
-    else
-      example_lines = gen_example(method[:name], method)
-    end
+    example_lines = case method[:name]
+                    when 'auto_post'
+                      gen_example('auto_post', method, path_append)
+                    when 'auto_delete'
+                      gen_example('auto_delete', method)
+                    else
+                      gen_example(method[:name], method)
+                    end
 
     action_lines.push NEWLINE
 
@@ -394,11 +391,12 @@ module SpecMaker
     action_lines.push get_json_page_annotation(h1name)
 
     # Write the output file.
-    if auto_file_name
-      file_name = sanitize_file_name(auto_file_name)
-    else
-      file_name = sanitize_file_name("#{@json_hash[:name].downcase}-#{method[:name].downcase}.md")
-    end
+    file_name = if auto_file_name
+                  sanitize_file_name(auto_file_name)
+                else
+                  sanitize_file_name("#{@json_hash[:name].downcase}-#{method[:name].downcase}.md")
+                end
+
     outfile = MARKDOWN_API_FOLDER + file_name
 
     file = File.new(outfile,'w')
@@ -426,11 +424,11 @@ module SpecMaker
     get_method_lines.push '<!-- { "blockType": "ignored" } -->' + TWONEWLINES
 
     get_method_lines.push '```http' + NEWLINE
-    if @json_hash[:collectionOf]
-      http_syntax = get_syntax('auto_list', top_rest_path, path_append)
-    else
-      http_syntax = get_syntax('auto_get', top_rest_path)
-    end
+    http_syntax = if @json_hash[:collectionOf]
+                    get_syntax('auto_list', top_rest_path, path_append)
+                  else
+                    get_syntax('auto_get', top_rest_path)
+                  end
 
     get_method_lines.push http_syntax.join(NEWLINE) + NEWLINE
     get_method_lines.push  '```' + TWONEWLINES
@@ -521,11 +519,12 @@ module SpecMaker
     end
 
     # Example
-    if @json_hash[:collectionOf]
-      example_lines = gen_example('auto_list', nil, path_append)
-    else
-      example_lines = gen_example('auto_get')
-    end
+    example_lines = if @json_hash[:collectionOf]
+                      gen_example('auto_list', nil, path_append)
+                    else
+                      gen_example('auto_get')
+                    end
+
     example_lines.each do |line|
       get_method_lines.push line
     end
@@ -535,14 +534,13 @@ module SpecMaker
     get_method_lines.push get_json_page_annotation(real_header)
 
     file_name = @json_hash[:collectionOf] ? "#{sanitize_file_name(@json_hash[:collectionOf].downcase)}-list.md" : "#{sanitize_file_name(@json_hash[:name].downcase)}-get.md"
-    if file_name_override
-      outfile = MARKDOWN_API_FOLDER + file_name_override
-    else
-      outfile = MARKDOWN_API_FOLDER + file_name
-    end
-    # if File.exists?(outfile)
-    #   puts "*-----> List file #{outfile} already exists."
-    # end
+
+    outfile = if file_name_override
+                MARKDOWN_API_FOLDER + file_name_override
+              else
+                MARKDOWN_API_FOLDER + file_name
+              end
+
     file = File.new(outfile,'w')
     get_method_lines.each do |line|
       file.write line
@@ -555,11 +553,11 @@ module SpecMaker
 
     # Header and description
 
-    if @json_hash[:updateDescription].empty?
-      h1name = "Update #{@json_hash[:name].downcase}"
-    else
-      h1name = "#{@json_hash[:updateDescription]}"
-    end
+    h1name = if @json_hash[:updateDescription].empty?
+               "Update #{@json_hash[:name].downcase}"
+             else
+               "#{@json_hash[:updateDescription]}"
+             end
 
     patch_method_lines.push HEADER1 + h1name + TWONEWLINES
 
@@ -595,7 +593,7 @@ module SpecMaker
     properties.each do |prop|
       if !prop[:isReadOnly]
            final_desc = prop[:description]
-        if (!prop[:enumName].nil?) && (@enumHash.key? prop[:enumName])
+        if !prop[:enumName].nil? && @enumHash.key?(prop[:enumName])
           append_enum = ' Possible values are: `' + @enumHash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
           final_desc += append_enum
         end
@@ -715,11 +713,11 @@ module SpecMaker
             end
             file_name = sanitize_file_name("#{@json_hash[:name].downcase}-post-#{prop[:name].downcase}.md")
             post_link = "../api/#{file_name}"
-            if SIMPLETYPES.include? prop[:dataType]
-              return_link = prop[:dataType]
-            else
-              return_link = '[' + prop[:dataType] + '](' + sanitize_file_name(prop[:dataType].downcase) + '.md)'
-            end
+            return_link = if SIMPLETYPES.include? prop[:dataType]
+                            prop[:dataType]
+                          else
+                            '[' + prop[:dataType] + '](' + sanitize_file_name(prop[:dataType].downcase) + '.md)'
+                          end
             @mdlines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{use_name} by posting to the #{prop[:name]} collection. |" + NEWLINE
             if File.exist?("#{MARKDOWN_API_FOLDER}/#{file_name}")
               puts 'POST create file already exists!'
@@ -730,11 +728,11 @@ module SpecMaker
               mtd[:displayName] = post_name
               mtd[:returnType] = prop[:dataType]
               create_description = get_create_description(mtd[:returnType])
-              if create_description.empty?
-                mtd[:description] = "Use this API to create a new #{use_name}."
-              else
-                mtd[:description] = create_description
-              end
+              mtd[:description] = if create_description.empty?
+                                    "Use this API to create a new #{use_name}."
+                                  else
+                                    create_description
+                                  end
 
               mtd[:parameters] = nil
               mtd[:httpSuccessCode] = '201'
@@ -782,11 +780,11 @@ module SpecMaker
         mtd[:displayName] = "Delete #{@json_hash[:name]}"
         mtd[:name] = 'auto_delete'
 
-        if @json_hash[:deleteDescription].empty?
-          mtd[:description] = mtd[:description] = "Delete #{@json_hash[:name]}."
-        else
-          mtd[:description] = @json_hash[:deleteDescription]
-        end
+        mtd[:description] = if @json_hash[:deleteDescription].empty?
+                              "Delete #{@json_hash[:name]}."
+                            else
+                              @json_hash[:deleteDescription]
+                            end
         mtd[:httpSuccessCode] = '204'
         mtd[:parameters] = nil
         create_method_mdfile(mtd, "#{sanitize_file_name(@json_hash[:name].downcase)}-delete.md")
@@ -866,11 +864,11 @@ module SpecMaker
     @mdlines.push get_json_page_annotation(@json_hash[:name] + ' resource')
 
     # Write the output file.
-    if @json_hash[:isEntitySet]
-      outfile = MARKDOWN_RESOURCE_FOLDER + sanitize_file_name(@resource.downcase) + '-collection.md'
-    else
-      outfile = MARKDOWN_RESOURCE_FOLDER + sanitize_file_name(@resource.downcase) + '.md'
-    end
+    outfile = if @json_hash[:isEntitySet]
+                MARKDOWN_RESOURCE_FOLDER + sanitize_file_name(@resource.downcase) + '-collection.md'
+              else
+                MARKDOWN_RESOURCE_FOLDER + sanitize_file_name(@resource.downcase) + '.md'
+              end
     file = File.new(outfile,'w')
     @mdlines.each do |line|
       file.write line
@@ -903,11 +901,11 @@ module SpecMaker
           mtd[:displayName] = post_name
           mtd[:returnType] = item[:collectionOf]
           create_description = get_create_description(item[:collectionOf])
-          if create_description.empty?
-            mtd[:description] = "Use this API to create a new #{use_name}."
-          else
-            mtd[:description] = create_description
-          end
+          mtd[:description] = if create_description.empty?
+                                "Use this API to create a new #{use_name}."
+                              else
+                                create_description
+                              end
           mtd[:parameters] = nil
           mtd[:httpSuccessCode] = '201'
           @json_hash = item
