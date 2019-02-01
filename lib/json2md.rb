@@ -622,14 +622,13 @@ module SpecMaker
       file.write line
     end
     @patch_files_created += 1
-
   end
 
   # Conversion to specification
   def self.convert_to_spec(item = nil)
     @mdlines = []
     is_post = nil
-    @json_hash = JSON.parse(item, {symbolize_names: true})
+    @json_hash = JSON.parse(item, symbolize_names: true)
 
     if @json_hash[:isEntitySet]
       @ientityset += 1
@@ -834,7 +833,6 @@ module SpecMaker
       file.write line
     end
     @resources_files_created += 1
-
   end
 
   def self.create_service_root
@@ -852,7 +850,7 @@ module SpecMaker
       puts "Service root file: #{file_name}"
       post_link = "../api/#{file_name}"
       return_link = '[' + item[:collectionOf] + '](' + sanitize_file_name(item[:collectionOf].downcase) + '.md)'
-      service_lines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{item[:collectionOf]} by posting to the #{item[:name] } collection. |" + NEWLINE
+      service_lines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{item[:collectionOf]} by posting to the #{item[:name]} collection. |" + NEWLINE
       if File.exist?("#{MARKDOWN_API_FOLDER}#{file_name}")
         puts 'EntitySet POST create file already exists!'
       else
