@@ -138,11 +138,6 @@ Layout/TrailingBlankLines:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
 
-# Offense count: 1
-Lint/NonLocalExitFromIterator:
-  Exclude:
-    - 'utils_e2j.rb'
-
 # Offense count: 2
 Lint/ParenthesesAsGroupedExpression:
   Exclude:
@@ -154,24 +149,6 @@ Lint/StringConversionInInterpolation:
   Exclude:
     - 'report_delta_edits.rb'
 
-# Offense count: 2
-# Configuration parameters: CountBlocks.
-Metrics/BlockNesting:
-  Max: 4
-
-# Offense count: 4
-# Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
-Naming/UncommunicativeBlockParamName:
-  Exclude:
-    - 'utils_e2j.rb'
-
-# Offense count: 34
-# Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
-# AllowedNames: io, id, to, by, on, in, at, ip, db
-Naming/UncommunicativeMethodParamName:
-  Exclude:
-    - 'utils_e2j.rb'
-
 # Offense count: 61
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: snake_case, camelCase
@@ -179,7 +156,6 @@ Naming/VariableName:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -197,12 +173,6 @@ Style/BracesAroundHashParameters:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-
-# Offense count: 10
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'utils_e2j.rb'
 
 # Offense count: 40
 # Cop supports --auto-correct.

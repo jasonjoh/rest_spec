@@ -75,7 +75,7 @@ module SpecMaker
   @enum_objects = {}
   @json_object = nil
   @base_types = {}
-  @iexampleFilesWrittem = 0
+  @example_files_written = 0
   @annotations = {}
 
   def self.camelcase(str = '')
@@ -88,14 +88,14 @@ module SpecMaker
   end
 
   def self.parse_annotations(target, annotations)
-    if annotations
-      if annotations.is_a?(Array)
-        annotations.each do |annotation|
-          parse_annotation(target, nil, annotation)
-        end
-      else
-        parse_annotation(target, nil, annotations)
+    return unless annotations
+
+    if annotations.is_a?(Array)
+      annotations.each do |annotation|
+        parse_annotation(target, nil, annotation)
       end
+    else
+      parse_annotation(target, nil, annotations)
     end
   end
 
@@ -117,8 +117,8 @@ module SpecMaker
     elsif annotation[:Record]
       if annotation[:Record][:PropertyValue]
         if annotation[:Record][:PropertyValue].is_a?(Array)
-          annotation[:Record][:PropertyValue].each do |propertyValue|
-            parse_annotation(target, term, propertyValue)
+          annotation[:Record][:PropertyValue].each do |prop_val|
+            parse_annotation(target, term, prop_val)
           end
         else
           parse_annotation(target, term, annotation[:Record][:PropertyValue])
@@ -129,22 +129,22 @@ module SpecMaker
     end
   end
 
-  def self.set_description(target, itemToSet)
+  def self.set_description(target, item_to_set)
     target = target.downcase
     # puts "-> Getting Annotation; Target: #{target}"
-    if @annotations[target]
-      itemToSet[:description] = @annotations[target]['description'] if @annotations[target]['description']
-    end
+    return unless @annotations[target]
+
+    item_to_set[:description] = @annotations[target]['description'] if @annotations[target]['description']
   end
 
   ###
   # Create object_method-name.md file in lowercase.
   #
   #
-  def self.create_examplefile(objectName = nil, methodName = nil)
-    File.open(JSON_EXAMPLE_FOLDER + (objectName + '_' + methodName).downcase + '.md', 'w') do |f|
+  def self.create_examplefile(object_name = nil, method_name = nil)
+    File.open(JSON_EXAMPLE_FOLDER + (object_name + '_' + method_name).downcase + '.md', 'w') do |f|
       f.write('##### Example', encoding: 'UTF-8')
-      @iexampleFilesWrittem += 1
+      @example_files_written += 1
     end
   end
 
@@ -152,15 +152,15 @@ module SpecMaker
   # Create example files for object/collection.
   #
   #
-  def self.create_auto_examplefiles(objectName = nil, isCollection)
-    if !isCollection
-      create_examplefile(objectName, 'auto_get')
-      create_examplefile(objectName, 'auto_post')
-      create_examplefile(objectName, 'auto_patch')
-      create_examplefile(objectName, 'auto_put')
-      create_examplefile(objectName, 'auto_delete')
+  def self.create_auto_examplefiles(object_name = nil, is_collection)
+    if !is_collection
+      create_examplefile(object_name, 'auto_get')
+      create_examplefile(object_name, 'auto_post')
+      create_examplefile(object_name, 'auto_patch')
+      create_examplefile(object_name, 'auto_put')
+      create_examplefile(object_name, 'auto_delete')
     else
-      create_examplefile(objectName, 'auto_list')
+      create_examplefile(object_name, 'auto_list')
     end
   end
 
@@ -168,9 +168,9 @@ module SpecMaker
   # Create example files from array that contains many methods (1 per method)
   #
   #
-  def self.create_basetype_examplefiles(methods = [], objectName = nil)
+  def self.create_basetype_examplefiles(methods = [], object_name = nil)
     methods.each do |item|
-      create_examplefile(objectName, item[:name])
+      create_examplefile(object_name, item[:name])
     end
   end
 
@@ -178,8 +178,8 @@ module SpecMaker
   # To prevent shallow copy errors, need to get a new object each time.
   #
   #
-  def self.deep_copy(o)
-    Marshal.load(Marshal.dump(o))
+  def self.deep_copy(obj)
+    Marshal.load(Marshal.dump(obj))
   end
 
   ###
@@ -187,42 +187,41 @@ module SpecMaker
   #  from an existing JSON file from previous run.
   #
   #
-  def self.preserve_method_descriptions(objectName = nil, method = nil)
-    fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
-    if File.file?(fullpath)
-      prevObject = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
-      prevMethods = prevObject[:methods]
-      prevMethods.each do |item|
-        next unless item[:name] == method[:name]
+  def self.preserve_method_descriptions(object_name = nil, method = nil)
+    fullpath = JSON_PREV_SOURCE_FOLDER + object_name.downcase + '.json'
+    return method unless File.file?(fullpath)
 
-        method[:description] = item[:description] unless item[:description].empty?
-        method[:displayName] = item[:displayName] if item[:displayName] && !item[:displayName].empty?
-        method[:prerequisites] = item[:prerequisites] unless item[:prerequisites].empty?
-        method[:parameters].each do |param|
-          item[:parameters].each do |paramOld|
-            if paramOld[:name] == param[:name]
-              param[:description] = paramOld[:description] unless paramOld[:description].empty?
-            end
+    prev_object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
+    prev_methods = prev_object[:methods]
+    prev_methods.each do |item|
+      next unless item[:name] == method[:name]
+
+      method[:description] = item[:description] unless item[:description].empty?
+      method[:displayName] = item[:displayName] if item[:displayName] && !item[:displayName].empty?
+      method[:prerequisites] = item[:prerequisites] unless item[:prerequisites].empty?
+      method[:parameters].each do |param|
+        item[:parameters].each do |old_param|
+          if old_param[:name] == param[:name]
+            param[:description] = old_param[:description] unless old_param[:description].empty?
           end
         end
       end
     end
+
     method
   end
 
-  def self.preserve_object_property_descriptions(objectName = nil)
-    fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
-    if File.file?(fullpath)
-      prevObject = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
-      @json_object[:description] = prevObject[:description]
-      prevProperties = prevObject[:properties]
-      prevProperties.each do |item|
-        @json_object[:properties].each do |currentProp|
-          currentProp[:description] = item[:description] if item[:name] == currentProp[:name]
-        end
+  def self.preserve_object_property_descriptions(object_name = nil)
+    fullpath = JSON_PREV_SOURCE_FOLDER + object_name.downcase + '.json'
+    return unless File.file?(fullpath)
+
+    prev_object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
+    @json_object[:description] = prev_object[:description]
+    prev_props = prev_object[:properties]
+    prev_props.each do |item|
+      @json_object[:properties].each do |current_prop|
+        current_prop[:description] = item[:description] if item[:name] == current_prop[:name]
       end
-      # else
-      #   puts "-----> No previous JSON file version exists for this resource."
     end
   end
 
@@ -230,38 +229,37 @@ module SpecMaker
   # Extract only the type name. Example: Collection(Microsoft.Graph.Recipient) to Recipient
   # and Microsoft.Graph.Recipient to Recipient
   #
-  def self.get_type(t = nil)
-    camelcase t[(t.rindex('.') + 1)..-1].chomp(')')
+  def self.get_type(type = nil)
+    camelcase t[(type.rindex('.') + 1)..-1].chomp(')')
   end
 
   def self.merge_members(current = nil, base = nil)
-    # if objectName != nil
+    # if object_name != nil
     #   if base.is_a?(Hash)
     #     dt = get_type(base[:Type])
-    #     return current if dt.downcase == objectName.downcase
+    #     return current if dt.downcase == object_name.downcase
     #   elsif base.is_a?(Array)
     #     base.each_with_index do |item, i|
     #       dt = get_type(item[:Type])
-    #         base.delete_at(i) if dt == objectName
+    #         base.delete_at(i) if dt == object_name
     #     end
     #   end
     # end
 
     arr = []
-    if current.nil?
-      return base
-    elsif current.is_a?(Array)
-      if base.nil?
-        return current
-      elsif base.is_a?(Array)
-        return current.concat base
-      elsif base.is_a?(Hash)
-        return current.push base
-      end
+    return base if current.nil?
+
+    if current.is_a?(Array)
+      return current if base.nil?
+
+      return current.concat base if base.is_a?(Array)
+
+      return current.push base if base.is_a?(Hash)
+
     elsif current.is_a?(Hash)
-      if base.nil?
-        return current
-      elsif base.is_a?(Array)
+      return current if base.nil?
+
+      if base.is_a?(Array)
         arr = base
         return arr.push current
       elsif base.is_a?(Hash)
@@ -272,7 +270,7 @@ module SpecMaker
     end
   end
 
-  def self.process_property(className, item = nil)
+  def self.process_property(class_name, item = nil)
     prop = deep_copy(@struct[:property])
     prop[:name] = camelcase item[:Name]
     dt = get_type(item[:Type])
@@ -290,14 +288,14 @@ module SpecMaker
     prop[:isUnicode] = false if item[:Unicode] == 'false'
     @iprop += 1
 
-    annotationTarget = className + '/' + item[:Name]
-    parse_annotations(annotationTarget, item[:Annotation])
-    set_description(annotationTarget, prop)
+    annotation_target = class_name + '/' + item[:Name]
+    parse_annotations(annotation_target, item[:Annotation])
+    set_description(annotation_target, prop)
 
     prop
   end
 
-  def self.process_navigation(className, item = nil)
+  def self.process_navigation(class_name, item = nil)
     prop = deep_copy(@struct[:property])
     prop[:name] = camelcase item[:Name]
     prop[:isRelationship] = true
@@ -310,14 +308,14 @@ module SpecMaker
     prop[:isUnicode] = false if item[:Unicode] == 'false'
     @inprop += 1
 
-    annotationTarget = className + '/' + item[:Name]
-    parse_annotations(annotationTarget, item[:Annotation])
-    set_description(annotationTarget, prop)
+    annotation_target = class_name + '/' + item[:Name]
+    parse_annotations(annotation_target, item[:Annotation])
+    set_description(annotation_target, prop)
 
     prop
   end
 
-  def self.process_complextype(className, item = nil)
+  def self.process_complextype(class_name, item = nil)
     prop = deep_copy(@struct[:property])
     prop[:name] = camelcase item[:Name]
     dt = get_type(item[:Type])
@@ -330,9 +328,9 @@ module SpecMaker
     prop[:isNullable] = false if item[:Nullable] == 'false'
     prop[:isUnicode] = false if item[:Unicode] == 'false'
 
-    annotationTarget = className + '/' + item[:Name]
-    parse_annotations(annotationTarget, item[:Annotation])
-    set_description(annotationTarget, prop)
+    annotation_target = class_name + '/' + item[:Name]
+    parse_annotations(annotation_target, item[:Annotation])
+    set_description(annotation_target, prop)
 
     prop
   end
@@ -390,65 +388,62 @@ module SpecMaker
     nil
   end
 
-  def self.fill_rest_path(parentPath = nil, entity = nil, isParentCollection = true)
-    jsonCache = {}
-    fill_rest_path_internal(parentPath, entity, isParentCollection, jsonCache)
-    write_json_from_cache(jsonCache)
+  def self.fill_rest_path(parent_path = nil, entity = nil, is_parent_collection = true)
+    json_cache = {}
+    fill_rest_path_internal(parent_path, entity, is_parent_collection, json_cache)
+    write_json_from_cache(json_cache)
   end
 
-  def self.read_json_from_cache(jsonCache = nil, fullpath = nil)
-    value = jsonCache[fullpath]
+  def self.read_json_from_cache(json_cache = nil, fullpath = nil)
+    value = json_cache[fullpath]
 
     if value.nil?
       value = JSON.parse(File.read(fullpath, encoding: 'UTF-8'))
-      jsonCache[fullpath] = value
+      json_cache[fullpath] = value
     end
 
     value
   end
 
-  def self.write_json_from_cache(jsonCache = nil)
-    jsonCache.each_pair do |fullpath, object|
+  def self.write_json_from_cache(json_cache = nil)
+    json_cache.each_pair do |fullpath, object|
       File.open(fullpath, 'w') do |f|
         f.write(JSON.pretty_generate(object, encoding: 'UTF-8'))
       end
     end
   end
 
-  def self.fill_rest_path_internal(parentPath = nil, entity = nil, isParentCollection = true, jsonCache = nil)
+  def self.fill_rest_path_internal(parent_path = nil, entity = nil, is_parent_collection = true, json_cache = nil)
     fullpath = JSON_SOURCE_FOLDER + '/' + entity.downcase + '.json'
     ids = ''
 
     # append Id at the end.
-    if File.file?(fullpath)
-      object = read_json_from_cache(jsonCache, fullpath)
+    return unless File.file?(fullpath)
 
-      # Check if the path already exists. This logic will eliminate deep redundant paths.
-      # May lose some important ones.. but if this check is removed, some really deep/complex
-      # logic needs to be inserted to add the
-      object['restPath'].keys.each do |k|
-        return if parentPath.downcase.include?(k.to_s.downcase)
-      end
+    object = read_json_from_cache(json_cache, fullpath)
 
-      # Construct path and remove empty | and <> at the end (account for no key being available on the object.)
-      object['properties'].each do |item|
-        ids = ids + item['name'] + '|' if item['isKey']
-      end
-      # construct the path and
-      k = if isParentCollection
-            "#{parentPath}/{#{ids.chomp('|')}}".chomp('/{}')
-          else
-            parentPath
-          end
-      object['restPath'][k] = true
-      return if object['properties'].empty?
+    # Check if the path already exists. This logic will eliminate deep redundant paths.
+    # May lose some important ones.. but if this check is removed, some really deep/complex
+    # logic needs to be inserted to add the
+    object['restPath'].keys.each do |k|
+      next if parent_path.downcase.include?(k.to_s.downcase)
+    end
 
-      object['properties'].each do |item|
-        fill_rest_path_internal("#{k}/#{item['name']}", item['dataType'], item['isCollection'], jsonCache) if item['isRelationship']
-      end
-      return
-    else
-      return
+    # Construct path and remove empty | and <> at the end (account for no key being available on the object.)
+    object['properties'].each do |item|
+      ids = ids + item['name'] + '|' if item['isKey']
+    end
+    # construct the path and
+    k = if is_parent_collection
+          "#{parent_path}/{#{ids.chomp('|')}}".chomp('/{}')
+        else
+          parent_path
+        end
+    object['restPath'][k] = true
+    return if object['properties'].empty?
+
+    object['properties'].each do |item|
+      fill_rest_path_internal("#{k}/#{item['name']}", item['dataType'], item['isCollection'], json_cache) if item['isRelationship']
     end
   end
 end
