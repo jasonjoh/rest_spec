@@ -457,4 +457,3 @@ Style/ZeroLengthPredicate:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'

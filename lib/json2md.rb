@@ -218,9 +218,9 @@ module SpecMaker
     final_desc = prop[:description]
     final_desc += TIMESTAMP_DESC if prop[:dataType] == 'DateTimeOffset'
 
-    if !prop[:enumName].nil? && @enumHash.key?(prop[:enumName])
+    if !prop[:enumName].nil? && @enum_hash.key?(prop[:enumName])
 
-      append_enum = ' Possible values are: `' + @enumHash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
+      append_enum = ' Possible values are: `' + @enum_hash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
       final_desc += append_enum
     end
     final_desc += ' Read-only.' if prop[:isReadOnly] || prop[:isKey]
@@ -302,8 +302,8 @@ module SpecMaker
         # Append optional and enum possible values (if applicable).
         final_param_desc = param[:isRequired] ? param[:description] : 'Optional. ' + param[:description]
 
-        if !param[:enumName].nil? && @enumHash.key?(param[:enumName])
-          append_enum = ' Possible values are: `' + @enumHash[param[:enumName]]['options'].keys.join('`, `') + '`.'
+        if !param[:enumName].nil? && @enum_hash.key?(param[:enumName])
+          append_enum = ' Possible values are: `' + @enum_hash[param[:enumName]]['options'].keys.join('`, `') + '`.'
           final_param_desc += append_enum
         end
         action_lines.push PIPE + param[:name] + PIPE + param[:dataType] + PIPE + final_param_desc + PIPE + NEWLINE
@@ -334,8 +334,8 @@ module SpecMaker
         # Append optional and enum possible values (if applicable).
         final_param_desc = param[:isRequired] ? param[:description] : 'Optional. ' + param[:description]
 
-        if !param[:enumName].nil? && @enumHash.key?(param[:enumName])
-          append_enum = ' Possible values are: `' + @enumHash[param[:enumName]]['options'].keys.join('`, `') + '`.'
+        if !param[:enumName].nil? && @enum_hash.key?(param[:enumName])
+          append_enum = ' Possible values are: `' + @enum_hash[param[:enumName]]['options'].keys.join('`, `') + '`.'
           final_param_desc += append_enum
         end
         action_lines.push PIPE + param[:name] + PIPE + param[:dataType] + PIPE + final_param_desc + PIPE + NEWLINE
@@ -596,8 +596,8 @@ module SpecMaker
       next if prop[:isReadOnly]
 
       final_desc = prop[:description]
-      if !prop[:enumName].nil? && @enumHash.key?(prop[:enumName])
-        append_enum = ' Possible values are: `' + @enumHash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
+      if !prop[:enumName].nil? && @enum_hash.key?(prop[:enumName])
+        append_enum = ' Possible values are: `' + @enum_hash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
         final_desc += append_enum
       end
       patch_method_lines.push PIPE + prop[:name] + PIPE + prop[:dataType] + PIPE + final_desc + PIPE + NEWLINE
@@ -889,7 +889,7 @@ module SpecMaker
   def self.generate_enums
     enum_lines = []
 
-    @enumHash.each do |key, value|
+    @enum_hash.each do |key, value|
       enum_lines.push HEADER3 + key + TWONEWLINES
       enum_lines.push ENUM_HEADER
       enum_lines.push TABLE_2ND_LINE_2COL

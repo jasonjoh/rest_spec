@@ -52,7 +52,7 @@ module SpecMaker
            '|Application                            | Not supported. |' + TWONEWLINES
 
   QRY_HEADER = '|Name|Value|Description|'.freeze
-  QRY_2nd_LINE = '|:---------------|:--------|:-------|'.freeze
+  # QRY_2ND_LINE = '|:---------------|:--------|:-------|'.freeze
   QRY_EXPAND = '|$expand|string|Comma-separated list of relationships to expand and include in the response. '.freeze
   QRY_FILTER  = '|$filter|string|Filter string that lets you filter the response based on a set of criteria.|'.freeze
   QRY_ORDERBY = '|$orderby|string|Comma-separated list of properties that are used to sort the order of items in the response collection.|'.freeze
@@ -142,8 +142,8 @@ module SpecMaker
   # To prevent shallow copy errors, need to get a new object each time.
   #
   #
-  def self.deep_copy(o)
-    Marshal.load(Marshal.dump(o))
+  def self.deep_copy(object)
+    Marshal.load(Marshal.dump(object))
   end
 
   @resources_files_created = 0
@@ -177,10 +177,10 @@ module SpecMaker
   ##
   # Load up all the known existing enums.
   ###
-  @enumHash = {}
+  @enum_hash = {}
 
   begin
-    @enumHash = JSON.parse File.read(ENUMS, encoding: 'UTF-8')
+    @enum_hash = JSON.parse File.read(ENUMS, encoding: 'UTF-8')
   rescue StandardError
     @logger.warn("JSON Enumeration input file doesn't exist: #{@current_object}")
   end
@@ -189,10 +189,10 @@ module SpecMaker
   @resource = ''
 
   def self.uncapitalize(str = '')
-    if str.length > 0
-      str[0, 1].downcase + str[1..-1]
-    else
+    if str.empty?
       str
+    else
+      str[0, 1].downcase + str[1..-1]
     end
   end
 
@@ -200,56 +200,51 @@ module SpecMaker
     UUID_DATE
   end
 
-  def self.get_create_description(objectName = nil, use_name = nil)
-    createDescription = ''
-    fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
+  def self.get_create_description(object_name = nil, use_name = nil)
+    create_description = ''
+    fullpath = JSON_SOURCE_FOLDER + '/' + object_name.downcase + '.json'
     if File.file?(fullpath)
       object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
-      createDescription = object[:createDescription]
+      create_description = object[:createDescription]
     end
-    createDescription = "Use this API to create a new #{use_name || objectName}." if createDescription.empty?
-    createDescription
+    create_description = "Use this API to create a new #{use_name || object_name}." if create_description.empty?
+    create_description
   end
 
-  def self.assign_value(dataType = nil, name = '')
-    return {} if dataType.downcase.start_with?('extension')
+  def self.assign_value(data_type = nil, name = '')
+    return {} if data_type.downcase.start_with?('extension')
 
-    if NUMERICTYPES.include? dataType.downcase
-      return 99
-    elsif DATETYPES.include? dataType.downcase
-      return 'datetime-value'
-    elsif %w[Url url].include? dataType.downcase
-      return 'url-value'
-    elsif %w[Boolean boolean Bool bool].include? dataType
-      return true
-    elsif SIMPLETYPES.include? dataType.downcase
-      return "#{name}-value"
-    else
-      return dump_complex_type(dataType)
-    end
+    return 99 if NUMERICTYPES.include? data_type.downcase
+
+    return 'datetime-value' if DATETYPES.include? data_type.downcase
+
+    return 'url-value' if %w[Url url].include? data_type.downcase
+
+    return true if %w[Boolean boolean Bool bool].include? data_type
+
+    return "#{name}-value" if SIMPLETYPES.include? data_type.downcase
+
+    # TODO: This causes stack errors with too many levels, fix this
+    dump_complex_type(data_type)
   end
 
-  def self.dump_complex_type(ct = nil)
+  def self.dump_complex_type(complex_type = nil)
     model = {}
-    fullpath = JSON_SOURCE_FOLDER + '/' + ct.downcase + '.json'
+    fullpath = JSON_SOURCE_FOLDER + '/' + complex_type.downcase + '.json'
     if File.file?(fullpath)
       begin
         object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
         object[:properties].each do |item|
-          if item[:name].downcase.start_with?('extension')
-            next
-            # model[item[:name]] = {}
-          else
-            model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship])
-            if item[:isCollection]
-              model[item[:name]] = if model[item[:name]].empty?
-                                     []
-                                   else
-                                     [model[item[:name]]]
-                                   end
-            end
-          end
-          # end
+          next if item[:name].downcase.start_with?('extension')
+
+          model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship])
+          next unless item[:isCollection]
+
+          model[item[:name]] = if model[item[:name]].empty?
+                                 []
+                               else
+                                 [model[item[:name]]]
+                               end
         end
       rescue SystemStackError
         model[:err] = 'SystemStackError'
@@ -259,49 +254,50 @@ module SpecMaker
     model
   end
 
-  def self.assign_value2(dataType = nil, name = '', isRel = false)
-    return {} if isRel
+  def self.assign_value2(data_type = nil, name = '', is_relation = false)
+    return {} if is_relation
 
-    return {} if dataType.downcase.start_with?('extension')
+    return {} if data_type.downcase.start_with?('extension')
 
-    return {} if dataType.downcase.start_with?('post')
+    return {} if data_type.downcase.start_with?('post')
 
-    if NUMERICTYPES.include? dataType.downcase
-      return 99
-    elsif DATETYPES.include? dataType.downcase
-      return 'datetime-value'
-    elsif %w[Url url].include? dataType.downcase
-      return 'url-value'
-    elsif %w[Boolean boolean Bool bool].include? dataType.downcase
-      return true
-    elsif SIMPLETYPES.include? dataType.downcase
-      return "#{name}-value"
-    else
-      return dump_complex_type(dataType)
-    end
+    return {} if data_type.downcase.start_with?('extension')
+
+    return 99 if NUMERICTYPES.include? data_type.downcase
+
+    return 'datetime-value' if DATETYPES.include? data_type.downcase
+
+    return 'url-value' if %w[Url url].include? data_type.downcase
+
+    return true if %w[Boolean boolean Bool bool].include? data_type
+
+    return "#{name}-value" if SIMPLETYPES.include? data_type.downcase
+
+    # TODO: This causes stack errors with too many levels, fix this
+    dump_complex_type(data_type)
   end
 
-  def self.get_json_model_method(objectName = nil, collFlag = false, includeKey = true, openTypeReq = false)
+  def self.get_json_model_method(object_name = nil, is_collection = false, include_key = true, open_type_req = false)
     model = {}
-    if SIMPLETYPES.include? objectName
-      model[:value] = assign_value(objectName, objectName)
-      model[:value] = if collFlag
-                        [assign_value(objectName, objectName)]
+    if SIMPLETYPES.include? object_name
+      model[:value] = assign_value(object_name, object_name)
+      model[:value] = if is_collection
+                        [assign_value(object_name, object_name)]
                       else
-                        assign_value(objectName, objectName)
+                        assign_value(object_name, object_name)
                       end
       return JSON.pretty_generate model
     end
-    isOpenType = false
-    fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
+    is_open_type = false
+    fullpath = JSON_SOURCE_FOLDER + '/' + object_name.downcase + '.json'
     if File.file?(fullpath)
       object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
-      isOpenType = true if object[:isOpenType]
+      is_open_type = true if object[:isOpenType]
       object[:properties].each_with_index do |item, i|
         next if item[:isRelationship]
         next if i > 5
 
-        unless includeKey
+        unless include_key
           next if item[:isKey]
         end
 
@@ -313,8 +309,8 @@ module SpecMaker
         model[item[:name]] = [model[item[:name]]] if item[:isCollection]
       end
     end
-    model = { 'value' => [model] } if collFlag
-    model = { objectName.to_s => model } if isOpenType && openTypeReq
+    model = { 'value' => [model] } if is_collection
+    model = { object_name.to_s => model } if is_open_type && open_type_req
     JSON.pretty_generate model, max_nesting: false
   end
 
@@ -355,10 +351,10 @@ module SpecMaker
     JSON.pretty_generate model
   end
 
-  def self.get_json_model_pretext(objectName = '', properties = [], baseType = '')
+  def self.get_json_model_pretext(object_name = '', properties = [], base_type = '')
     model = deep_copy(@mdresource)
-    model['@odata.type'] = "#{@service[:namespace]}.#{objectName}"
-    model['baseType'] = baseType
+    model['@odata.type'] = "#{@service[:namespace]}.#{object_name}"
+    model['baseType'] = base_type
     properties.each do |item|
       next if item[:isRelationship]
 
@@ -406,7 +402,7 @@ module SpecMaker
     '<!-- ' + (JSON.pretty_generate model) + '-->'
   end
 
-  def self.get_json_response_pretext(type = nil, isArray = false)
+  def self.get_json_response_pretext(type = nil, is_array = false)
     model = deep_copy(@mdresponse)
     if type.nil? || type == 'none'
     else
@@ -415,13 +411,13 @@ module SpecMaker
                              else
                                "#{@service[:namespace]}.#{type}"
                              end
-      model[:isCollection] = true if isArray
+      model[:isCollection] = true if is_array
     end
     '<!-- ' + (JSON.pretty_generate model) + ' -->'
   end
 
-  def self.sanitize_file_name(fileName)
-    fileName.tr('_', '-')
+  def self.sanitize_file_name(file_name)
+    file_name.tr('_', '-')
   end
 
   # module end
