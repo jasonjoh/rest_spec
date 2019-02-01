@@ -35,7 +35,7 @@ module SpecMaker
 
   # Load the structure
   JSON_STRUCTURE = "../jsonFiles/template/restresource_structures.json"
-  @struct = JSON.parse(File.read(JSON_STRUCTURE, :encoding => 'UTF-8'), :symbolize_names => true)
+  @struct = JSON.parse(File.read(JSON_STRUCTURE, encoding: 'UTF-8'), symbolize_names: true)
   @template = @struct[:object]
   @service = @struct[:serviceSettings]
 
@@ -51,9 +51,7 @@ module SpecMaker
   Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
   LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
-  if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
-    File.delete("#{LOG_FOLDER}/#{LOG_FILE}")
-  end
+  File.delete("#{LOG_FOLDER}/#{LOG_FILE}") if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger.level = Logger::DEBUG
   # End log file
@@ -110,9 +108,7 @@ module SpecMaker
       term = term + "/" + annotation[:Property].downcase
     end
 
-    if !@annotations[target]
-      @annotations[target] = {}
-    end
+    @annotations[target] = {} unless @annotations[target]
 
     if annotation[:Bool]
       @annotations[target][term] = annotation[:Bool].casecmp('true').zero?
@@ -137,9 +133,7 @@ module SpecMaker
     target = target.downcase
     # puts "-> Getting Annotation; Target: #{target}"
     if @annotations[target]
-      if @annotations[target]["description"]
-        itemToSet[:description] = @annotations[target]["description"]
-      end
+      itemToSet[:description] = @annotations[target]["description"] if @annotations[target]["description"]
     end
   end
 
@@ -149,7 +143,7 @@ module SpecMaker
   #
   def self.create_examplefile(objectName = nil, methodName = nil)
     File.open(JSON_EXAMPLE_FOLDER + (objectName + '_' + methodName).downcase + ".md", "w") do |f|
-      f.write('##### Example', :encoding => 'UTF-8')
+      f.write('##### Example', encoding: 'UTF-8')
       @iexampleFilesWrittem = @iexampleFilesWrittem + 1
     end
   end
@@ -196,17 +190,17 @@ module SpecMaker
   def self.preserve_method_descriptions(objectName = nil, method = nil)
     fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
     if File.file?(fullpath)
-      prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
+      prevObject = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
       prevMethods = prevObject[:methods]
       prevMethods.each do |item|
         if item[:name] == method[:name]
-          method[:description] = item[:description] if !item[:description].empty?
+          method[:description] = item[:description] unless item[:description].empty?
           method[:displayName] = item[:displayName] if item[:displayName] && !item[:displayName].empty?
-          method[:prerequisites] = item[:prerequisites] if !item[:prerequisites].empty?
+          method[:prerequisites] = item[:prerequisites] unless item[:prerequisites].empty?
           method[:parameters].each do |param|
             item[:parameters].each do |paramOld|
               if paramOld[:name] == param[:name]
-                param[:description] = paramOld[:description] if !paramOld[:description].empty?
+                param[:description] = paramOld[:description] unless paramOld[:description].empty?
               end
             end
           end
@@ -219,14 +213,12 @@ module SpecMaker
   def self.preserve_object_property_descriptions(objectName = nil)
     fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
     if File.file?(fullpath)
-      prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
+      prevObject = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
       @json_object[:description] = prevObject[:description]
       prevProperties = prevObject[:properties]
       prevProperties.each do |item|
         @json_object[:properties].each do |currentProp|
-          if item[:name] == currentProp[:name]
-            currentProp[:description] = item[:description]
-          end
+          currentProp[:description] = item[:description] if item[:name] == currentProp[:name]
         end
       end
       # else
@@ -290,15 +282,9 @@ module SpecMaker
       prop[:enumName] = dt
       prop[:dataType] = "string"
     end
-    if @key_save.include?(item[:Name])
-      prop[:isKey], prop[:isReadOnly] = true, true
-    end
-    if item[:Nullable] == 'false'
-      prop[:isNullable] = false
-    end
-    if item[:Unicode] == 'false'
-      prop[:isUnicode] = false
-    end
+    prop[:isKey], prop[:isReadOnly] = true, true if @key_save.include?(item[:Name])
+    prop[:isNullable] = false if item[:Nullable] == 'false'
+    prop[:isUnicode] = false if item[:Unicode] == 'false'
     @iprop = @iprop + 1
 
     annotationTarget = className + "/" + item[:Name]
@@ -317,12 +303,8 @@ module SpecMaker
     prop[:dataType] = dt
     prop[:isNullable] = true
     prop[:isReadOnly] = true
-    if item[:Nullable] == 'false'
-      prop[:isNullable] = false
-    end
-    if item[:Unicode] == 'false'
-      prop[:isUnicode] = false
-    end
+    prop[:isNullable] = false if item[:Nullable] == 'false'
+    prop[:isUnicode] = false if item[:Unicode] == 'false'
     @inprop = @inprop + 1
 
     annotationTarget = className + "/" + item[:Name]
@@ -342,12 +324,8 @@ module SpecMaker
       prop[:enumName] = dt
       prop[:dataType] = "String"
     end
-    if item[:Nullable] == 'false'
-      prop[:isNullable] = false
-    end
-    if item[:Unicode] == 'false'
-      prop[:isUnicode] = false
-    end
+    prop[:isNullable] = false if item[:Nullable] == 'false'
+    prop[:isUnicode] = false if item[:Unicode] == 'false'
 
     annotationTarget = className + "/" + item[:Name]
     parse_annotations(annotationTarget, item[:Annotation])
@@ -381,12 +359,8 @@ module SpecMaker
         dtp = get_type(p[:Type])
         parm[:dataType] = dtp
         parm[:isCollection] = true if p[:Type].start_with?('Collection(')
-        if p[:Nullable] == 'false'
-          parm[:isNullable] = false
-        end
-        if p[:Unicode] == 'false'
-          parm[:isUnicode] = false
-        end
+        parm[:isNullable] = false if p[:Nullable] == 'false'
+        parm[:isUnicode] = false if p[:Unicode] == 'false'
 
         mtd[:parameters].push parm
       end
@@ -423,7 +397,7 @@ module SpecMaker
     value = jsonCache[fullpath]
 
     if value.nil?
-      value = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'))
+      value = JSON.parse(File.read(fullpath, encoding: 'UTF-8'))
       jsonCache[fullpath] = value
     end
 
@@ -433,7 +407,7 @@ module SpecMaker
   def self.write_json_from_cache(jsonCache = nil)
     jsonCache.each_pair do |fullpath, object|
       File.open(fullpath, "w") do |f|
-        f.write(JSON.pretty_generate object, :encoding => 'UTF-8')
+        f.write(JSON.pretty_generate object, encoding: 'UTF-8')
       end
     end
   end
@@ -450,16 +424,12 @@ module SpecMaker
       # May lose some important ones.. but if this check is removed, some really deep/complex
       # logic needs to be inserted to add the
       object["restPath"].keys.each do |k|
-        if parentPath.downcase.include?(k.to_s.downcase)
-          return
-        end
+        return if parentPath.downcase.include?(k.to_s.downcase)
       end
 
       # Construct path and remove empty | and <> at the end (account for no key being available on the object.)
       object["properties"].each do |item|
-        if item["isKey"]
-          ids = ids + item["name"] + '|'
-        end
+        ids = ids + item["name"] + '|' if item["isKey"]
       end
       # construct the path and
       k = if isParentCollection
@@ -471,9 +441,7 @@ module SpecMaker
       return if object["properties"].length == 0
 
       object["properties"].each do |item|
-        if item["isRelationship"]
-          fill_rest_path_internal("#{k}/#{item["name"]}", item["dataType"], item["isCollection"], jsonCache)
-        end
+        fill_rest_path_internal("#{k}/#{item["name"]}", item["dataType"], item["isCollection"], jsonCache) if item["isRelationship"]
       end
       return
     else

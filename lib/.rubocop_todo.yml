@@ -212,14 +212,12 @@ Style/HashSyntax:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 34
 # Cop supports --auto-correct.
 Style/IfUnlessModifier:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 2
 Style/MultipleComparison:
@@ -241,7 +239,6 @@ Style/MutableConstant:
 Style/NegatedIf:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 9
 # Cop supports --auto-correct.
