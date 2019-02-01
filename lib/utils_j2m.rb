@@ -88,7 +88,7 @@ module SpecMaker
 
   # Load the structure
   JSON_STRUCTURE = "../jsonFiles/template/restresource_structures.json"
-  @struct = JSON.parse(File.read(JSON_STRUCTURE, :encoding => 'UTF-8'), :symbolize_names => true)
+  @struct = JSON.parse(File.read(JSON_STRUCTURE, encoding: 'UTF-8'), symbolize_names: true)
   @template = @struct[:object]
   @service = @struct[:serviceSettings]
   @mdresource = @struct[:mdresource]
@@ -173,7 +173,7 @@ module SpecMaker
   @annotations = {}
 
   begin
-    @annotations = JSON.parse File.read(ANNOTATIONS, :encoding => 'UTF-8')
+    @annotations = JSON.parse File.read(ANNOTATIONS, encoding: 'UTF-8')
   rescue
     @logger.warn("JSON Annotations input file doesn't exist: #{@current_object}")
   end
@@ -184,7 +184,7 @@ module SpecMaker
   @enumHash = {}
 
   begin
-    @enumHash = JSON.parse File.read(ENUMS, :encoding => 'UTF-8')
+    @enumHash = JSON.parse File.read(ENUMS, encoding: 'UTF-8')
   rescue
     @logger.warn("JSON Enumeration input file doesn't exist: #{@current_object}")
   end
@@ -208,7 +208,7 @@ module SpecMaker
     createDescription = ''
     fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
     if File.file?(fullpath)
-      object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
+      object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
       createDescription = object[:createDescription]
     end
     createDescription = "Use this API to create a new #{use_name || objectName}." if createDescription.empty?
@@ -240,7 +240,7 @@ module SpecMaker
     fullpath = JSON_SOURCE_FOLDER + '/' + ct.downcase + '.json'
     if File.file?(fullpath)
       begin
-        object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
+        object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
         object[:properties].each do |item|
           if item[:name].downcase.start_with?('extension')
             next
@@ -248,11 +248,11 @@ module SpecMaker
           else
             model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship])
             if item[:isCollection]
-              if model[item[:name]].empty?
-                model[item[:name]] = []
-              else
-                model[item[:name]] = [model[item[:name]]]
-              end
+              model[item[:name]] = if model[item[:name]].empty?
+                                     []
+                                   else
+                                     [model[item[:name]]]
+                                   end
             end
           end
           # end
@@ -297,17 +297,17 @@ module SpecMaker
     model = {}
     if SIMPLETYPES.include? objectName
       model[:value] = assign_value(objectName, objectName)
-      if collFlag
-        model[:value] = [assign_value(objectName, objectName)]
-      else
-        model[:value] = assign_value(objectName, objectName)
-      end
+      model[:value] = if collFlag
+                        [assign_value(objectName, objectName)]
+                      else
+                        assign_value(objectName, objectName)
+                      end
       return JSON.pretty_generate model
     end
     isOpenType = false
     fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
     if File.file?(fullpath)
-      object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
+      object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
       if object[:isOpenType]
         isOpenType = true
       end
@@ -319,11 +319,11 @@ module SpecMaker
           next if item[:isKey]
         end
 
-        if item[:name].downcase.start_with?('extension')
-          model[item[:name]] = {}
-        else
-          model[item[:name]] = assign_value(item[:dataType], item[:name])
-        end
+        model[item[:name]] = if item[:name].downcase.start_with?('extension')
+                               {}
+                             else
+                               assign_value(item[:dataType], item[:name])
+                             end
         if item[:isCollection]
           model[item[:name]] = [model[item[:name]]]
         end
@@ -335,7 +335,7 @@ module SpecMaker
     if isOpenType && openTypeReq
       model = { "#{objectName}" => model }
     end
-    return JSON.pretty_generate model, :max_nesting => false
+    return JSON.pretty_generate model, max_nesting: false
   end
 
   def self.get_json_model_params(params = [])
@@ -348,7 +348,7 @@ module SpecMaker
       end
     end
 
-    return JSON.pretty_generate model, :max_nesting => false
+    return JSON.pretty_generate model, max_nesting: false
   end
 
   def self.get_json_model(properties = [])
@@ -356,19 +356,19 @@ module SpecMaker
     properties.each do |item|
       next if item[:isRelationship]
 
-      if NUMERICTYPES.include? item[:dataType].downcase
-        model[item[:name]] = 1024
-      elsif DATETYPES.include? item[:dataType].downcase
-        model[item[:name]] = "String (timestamp)"
-      elsif %w[Url url].include? item[:dataType]
-        model[item[:name]] = "url"
-      elsif %w[Boolean boolean Bool bool].include? item[:dataType]
-        model[item[:name]] = true
-      elsif SIMPLETYPES.include? item[:dataType].downcase
-        model[item[:name]] = "#{item[:dataType]}"
-      else
-        model[item[:name]] = { "@odata.type" => "#{@service[:namespace]}.#{item[:dataType]}" }
-      end
+      model[item[:name]] = if NUMERICTYPES.include? item[:dataType].downcase
+                             1024
+                           elsif DATETYPES.include? item[:dataType].downcase
+                             "String (timestamp)"
+                           elsif %w[Url url].include? item[:dataType]
+                             "url"
+                           elsif %w[Boolean boolean Bool bool].include? item[:dataType]
+                             true
+                           elsif SIMPLETYPES.include? item[:dataType].downcase
+                             "#{item[:dataType]}"
+                           else
+                             { "@odata.type" => "#{@service[:namespace]}.#{item[:dataType]}" }
+                           end
 
       if item[:isKey]
         model[item[:name]] = model[item[:name]] + ' (identifier)'
@@ -442,11 +442,11 @@ module SpecMaker
     model = deep_copy(@mdresponse)
     if type == nil || type == 'none'
     else
-      if SIMPLETYPES.include? type
-        model["@odata.type"] = type
-      else
-        model["@odata.type"] = "#{@service[:namespace]}.#{type}"
-      end
+      model["@odata.type"] = if SIMPLETYPES.include? type
+                               type
+                             else
+                               "#{@service[:namespace]}.#{type}"
+                             end
       model[:isCollection] = true if isArray
     end
     return "<!-- " + (JSON.pretty_generate model) + " -->"

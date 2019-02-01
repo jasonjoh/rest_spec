@@ -292,7 +292,6 @@ Style/ConditionalAssignment:
   Exclude:
     - 'edmx2json.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -317,7 +316,6 @@ Style/HashSyntax:
     - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 1
 Style/IfInsideElse:
