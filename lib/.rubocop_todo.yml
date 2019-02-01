@@ -304,7 +304,6 @@ Style/EmptyLiteral:
 Style/GuardClause:
   Exclude:
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 40
 # Cop supports --auto-correct.
@@ -328,7 +327,6 @@ Style/IfUnlessModifier:
   Exclude:
     - 'diff_two_versions.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 2
 Style/MultipleComparison:

@@ -124,9 +124,7 @@ module SpecMaker
   Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
   LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
-  if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
-    File.delete("#{LOG_FOLDER}/#{LOG_FILE}")
-  end
+  File.delete("#{LOG_FOLDER}/#{LOG_FILE}") if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger.level = Logger::DEBUG
   # End log file
@@ -163,9 +161,7 @@ module SpecMaker
     abort("*** FATAL ERROR *** Input JSON resource folder: #{JSON_SOURCE_FOLDER} doesn't exist. Correct and re-run.")
   end
 
-  if !File.exist?(EXAMPLES_FOLDER)
-    @logger.warn("API examples folder does not exist")
-  end
+  @logger.warn("API examples folder does not exist") if !File.exist?(EXAMPLES_FOLDER)
 
   ##
   # Load up all the known existing annotations.
@@ -216,9 +212,7 @@ module SpecMaker
   end
 
   def self.assign_value(dataType = nil, name = '')
-    if dataType.downcase.start_with?('extension')
-      return {}
-    end
+    return {} if dataType.downcase.start_with?('extension')
 
     if NUMERICTYPES.include? dataType.downcase
       return 99
@@ -266,17 +260,11 @@ module SpecMaker
   end
 
   def self.assign_value2(dataType = nil, name = '', isRel = false)
-    if isRel
-      return {}
-    end
+    return {} if isRel
 
-    if dataType.downcase.start_with?('extension')
-      return {}
-    end
+    return {} if dataType.downcase.start_with?('extension')
 
-    if dataType.downcase.start_with?('post')
-      return {}
-    end
+    return {} if dataType.downcase.start_with?('post')
 
     if NUMERICTYPES.include? dataType.downcase
       return 99
@@ -308,9 +296,7 @@ module SpecMaker
     fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
     if File.file?(fullpath)
       object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
-      if object[:isOpenType]
-        isOpenType = true
-      end
+      isOpenType = true if object[:isOpenType]
       object[:properties].each_with_index do |item, i|
         next if item[:isRelationship]
         next if i > 5
@@ -324,17 +310,11 @@ module SpecMaker
                              else
                                assign_value(item[:dataType], item[:name])
                              end
-        if item[:isCollection]
-          model[item[:name]] = [model[item[:name]]]
-        end
+        model[item[:name]] = [model[item[:name]]] if item[:isCollection]
       end
     end
-    if collFlag
-      model = { "value" => [model] }
-    end
-    if isOpenType && openTypeReq
-      model = { "#{objectName}" => model }
-    end
+    model = { "value" => [model] } if collFlag
+    model = { "#{objectName}" => model } if isOpenType && openTypeReq
     return JSON.pretty_generate model, max_nesting: false
   end
 
@@ -343,9 +323,7 @@ module SpecMaker
 
     params.each do |item|
       model[item[:name]] = assign_value(item[:dataType], item[:name])
-      if item[:isCollection]
-        model[item[:name]] = [model[item[:name]]]
-      end
+      model[item[:name]] = [model[item[:name]]] if item[:isCollection]
     end
 
     return JSON.pretty_generate model, max_nesting: false
@@ -370,15 +348,9 @@ module SpecMaker
                              { "@odata.type" => "#{@service[:namespace]}.#{item[:dataType]}" }
                            end
 
-      if item[:isKey]
-        model[item[:name]] = model[item[:name]] + ' (identifier)'
-      end
-      if %w[eTag cTag etag ctag].include?(item[:name])
-        model[item[:name]] = model[item[:name]] + ' (etag)'
-      end
-      if item[:isCollection]
-        model[item[:name]] = [model[item[:name]]]
-      end
+      model[item[:name]] = model[item[:name]] + ' (identifier)' if item[:isKey]
+      model[item[:name]] = model[item[:name]] + ' (etag)' if %w[eTag cTag etag ctag].include?(item[:name])
+      model[item[:name]] = [model[item[:name]]] if item[:isCollection]
     end
     return JSON.pretty_generate model
   end
@@ -390,13 +362,9 @@ module SpecMaker
     properties.each do |item|
       next if item[:isRelationship]
 
-      if item[:isNullable] || item[:isRelationship]
-        model[:optionalProperties].push item[:name]
-      end
+      model[:optionalProperties].push item[:name] if item[:isNullable] || item[:isRelationship]
 
-      if item[:isKey]
-        model["keyProperty"] = item[:name]
-      end
+      model["keyProperty"] = item[:name] if item[:isKey]
     end
     return "<!-- " + (JSON.pretty_generate model) + "-->"
   end
