@@ -403,6 +403,7 @@ module SpecMaker
     action_lines.each do |line|
       file.write line
     end
+    file.close
     @method_files_created += 1
   end
 
@@ -530,9 +531,9 @@ module SpecMaker
     end
 
     get_method_lines.push NEWLINE + uuid_date + NEWLINE
-    # Write the output file.
     get_method_lines.push get_json_page_annotation(real_header)
 
+    # Write the output file.
     file_name = @json_hash[:collectionOf] ? "#{sanitize_file_name(@json_hash[:collectionOf].downcase)}-list.md" : "#{sanitize_file_name(@json_hash[:name].downcase)}-get.md"
 
     outfile = if file_name_override
@@ -545,6 +546,7 @@ module SpecMaker
     get_method_lines.each do |line|
       file.write line
     end
+    file.close
     @get_list_files_created += 1
   end
 
@@ -621,6 +623,7 @@ module SpecMaker
     patch_method_lines.each do |line|
       file.write line
     end
+    file.close
     @patch_files_created += 1
   end
 
@@ -832,6 +835,7 @@ module SpecMaker
     @mdlines.each do |line|
       file.write line
     end
+    file.close
     @resources_files_created += 1
   end
 
@@ -879,6 +883,7 @@ module SpecMaker
     service_lines.each do |line|
       file.write line
     end
+    file.close
   end
 
   def self.generate_enums
@@ -904,6 +909,7 @@ module SpecMaker
     enum_lines.each do |line|
       file.write line
     end
+    file.close
   end
 
   #####
