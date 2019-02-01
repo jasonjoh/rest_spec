@@ -675,11 +675,9 @@ module SpecMaker
         if @json_hash[:collectionOf]
           return_link = '[' + @json_hash[:collectionOf] + '](' + sanitize_file_name(@json_hash[:collectionOf].downcase) + '.md)'
           @mdlines.push "|[List](../api/#{sanitize_file_name(@json_hash[:collectionOf].downcase)}-list.md) | #{return_link} collection |Get #{uncapitalize @json_hash[:collectionOf]} object collection. |" + NEWLINE
-        else
-          if is_property
-            return_link = '[' + @json_hash[:name] + '](' + @json_hash[:name].downcase + '.md)'
-            @mdlines.push "| [Get #{@json_hash[:name]}](../api/#{sanitize_file_name(@json_hash[:name].downcase)}-get.md) | #{return_link} | Read properties and relationships of #{uncapitalize @json_hash[:name]} object. |" + NEWLINE
-          end
+        elsif is_property
+          return_link = '[' + @json_hash[:name] + '](' + @json_hash[:name].downcase + '.md)'
+          @mdlines.push "| [Get #{@json_hash[:name]}](../api/#{sanitize_file_name(@json_hash[:name].downcase)}-get.md) | #{return_link} | Read properties and relationships of #{uncapitalize @json_hash[:name]} object. |" + NEWLINE
         end
         create_get_method
       end
@@ -707,20 +705,13 @@ module SpecMaker
                           '[' + prop[:dataType] + '](' + sanitize_file_name(prop[:dataType].downcase) + '.md)'
                         end
           @mdlines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{use_name} by posting to the #{prop[:name]} collection. |" + NEWLINE
-          if File.exist?("#{MARKDOWN_API_FOLDER}/#{file_name}")
-            puts 'POST create file already exists!'
-          else
+          unless File.exist?("#{MARKDOWN_API_FOLDER}/#{file_name}")
             mtd = deep_copy(@struct[:method])
 
             mtd[:name] = 'auto_post'
             mtd[:displayName] = post_name
             mtd[:returnType] = prop[:dataType]
-            create_description = get_create_description(mtd[:returnType])
-            mtd[:description] = if create_description.empty?
-                                  "Use this API to create a new #{use_name}."
-                                else
-                                  create_description
-                                end
+            mtd[:description] = get_create_description(mtd[:returnType], use_name)
 
             mtd[:parameters] = nil
             mtd[:httpSuccessCode] = '201'
@@ -858,13 +849,12 @@ module SpecMaker
     @serviceroot.each do |item|
       next unless item[:collectionOf]
 
-      use_name = item[:collectionOf]
-      post_name = 'Create ' + use_name
+      post_name = "Create #{item[:collectionOf]}"
       file_name = sanitize_file_name("#{item[:collectionOf].downcase}-post-#{item[:name].downcase}.md")
       puts "Service root file: #{file_name}"
       post_link = "../api/#{file_name}"
       return_link = '[' + item[:collectionOf] + '](' + sanitize_file_name(item[:collectionOf].downcase) + '.md)'
-      service_lines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{use_name} by posting to the #{item[:name] } collection. |" + NEWLINE
+      service_lines.push "| [#{post_name}](#{post_link}) | #{return_link} | Create a new #{item[:collectionOf]} by posting to the #{item[:name] } collection. |" + NEWLINE
       if File.exist?("#{MARKDOWN_API_FOLDER}#{file_name}")
         puts 'EntitySet POST create file already exists!'
       else
@@ -872,12 +862,8 @@ module SpecMaker
         mtd[:name] = 'auto_post'
         mtd[:displayName] = post_name
         mtd[:returnType] = item[:collectionOf]
-        create_description = get_create_description(item[:collectionOf])
-        mtd[:description] = if create_description.empty?
-                              "Use this API to create a new #{use_name}."
-                            else
-                              create_description
-                            end
+        mtd[:description] = get_create_description(item[:collectionOf])
+
         mtd[:parameters] = nil
         mtd[:httpSuccessCode] = '201'
         @json_hash = item

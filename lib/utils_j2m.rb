@@ -209,13 +209,14 @@ module SpecMaker
 		return UUID_DATE
 	end
 
-	def self.get_create_description(objectName=nil)
+	def self.get_create_description(objectName=nil, use_name = nil)
 		createDescription = ''
 		fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
 		if File.file?(fullpath)
 			object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
 			createDescription = object[:createDescription]
 		end
+		createDescription = "Use this API to create a new #{use_name || objectName}." if createDescription.empty?
 		return createDescription
 	end
 
