@@ -2,65 +2,65 @@ require 'FileUtils'
 
 module SpecMaker
   # Initialize
-  JSON_BASE_FOLDER = "../jsonFiles/#{$options[:version]}/"
+  JSON_BASE_FOLDER = "../jsonFiles/#{$options[:version]}/".freeze
   JSON_SOURCE_FOLDER = JSON_BASE_FOLDER + 'rest/'
   JSON_SETTINGS_FOLDER = JSON_BASE_FOLDER + 'settings/'
   ENUMS = JSON_SETTINGS_FOLDER + 'restenums.json'
   ACTIONS = JSON_BASE_FOLDER + 'actions.json'
   ANNOTATIONS = JSON_SETTINGS_FOLDER + 'annotations.json'
 
-  MARKDOWN_BASE_FOLDER = "../markdown/#{$options[:version]}/"
-  MARKDOWN_RESOURCE_FOLDER = MARKDOWN_BASE_FOLDER + "resources/"
-  MARKDOWN_API_FOLDER = MARKDOWN_BASE_FOLDER + "api/"
-  EXAMPLES_FOLDER = JSON_SOURCE_FOLDER + "examples/"
+  MARKDOWN_BASE_FOLDER = "../markdown/#{$options[:version]}/".freeze
+  MARKDOWN_RESOURCE_FOLDER = MARKDOWN_BASE_FOLDER + 'resources/'
+  MARKDOWN_API_FOLDER = MARKDOWN_BASE_FOLDER + 'api/'
+  EXAMPLES_FOLDER = JSON_SOURCE_FOLDER + 'examples/'
   JSON_EXAMPLE_FOLDER = JSON_BASE_FOLDER + 'examples/'
-  SERVER = "https://graph.microsoft.com/#{$options[:version]}"
-  HEADER1 = '# '
-  HEADER2 = '## '
-  HEADER3 = '### '
-  HEADER4 = '#### '
-  HEADER5 = '##### '
+  SERVER = "https://graph.microsoft.com/#{$options[:version]}".freeze
+  HEADER1 = '# '.freeze
+  HEADER2 = '## '.freeze
+  HEADER3 = '### '.freeze
+  HEADER4 = '#### '.freeze
+  HEADER5 = '##### '.freeze
   # BACKTOMETHOD = '[Back](#methods)'
-  NEWLINE = "\n"
+  NEWLINE = "\n".freeze
   # BACKTOPROPERTY = NEWLINE + '[Back](#properties)'
-  PIPE = '|'
-  TWONEWLINES = "\n\n"
+  PIPE = '|'.freeze
+  TWONEWLINES = "\n\n".freeze
 
   # Alert styles
-  ALERT_NOTE = "> **Note:** "
-  ALERT_IMPORTANT = "> **Important:** "
+  ALERT_NOTE = '> **Note:** '.freeze
+  ALERT_IMPORTANT = '> **Important:** '.freeze
   # ALERT_NOTE = "> [!NOTE]\n> "
   # ALERT_IMPORTANT = "> [!IMPORTANT]\n> "
 
-  TABLE_2ND_LINE =       "|:-------------|:------------|:------------|" + NEWLINE
-  PROPERTY_HEADER =      "| Property     | Type        | Description |" + NEWLINE
-  PARAM_HEADER =         "| Parameter    | Type        | Description |" + NEWLINE
-  RELATIONSHIP_HEADER =  "| Relationship | Type        | Description |" + NEWLINE
-  TASKS_HEADER =         "| Method       | Return Type | Description |" + NEWLINE
+  TABLE_2ND_LINE =       '|:-------------|:------------|:------------|' + NEWLINE
+  PROPERTY_HEADER =      '| Property     | Type        | Description |' + NEWLINE
+  PARAM_HEADER =         '| Parameter    | Type        | Description |' + NEWLINE
+  RELATIONSHIP_HEADER =  '| Relationship | Type        | Description |' + NEWLINE
+  TASKS_HEADER =         '| Method       | Return Type | Description |' + NEWLINE
 
-  TABLE_2ND_LINE_2COL =  "|:--------------|:--------------|" + NEWLINE
-  HTTP_HEADER =          "| Name          | Description   |" + NEWLINE
+  TABLE_2ND_LINE_2COL =  '|:--------------|:--------------|' + NEWLINE
+  HTTP_HEADER =          '| Name          | Description   |' + NEWLINE
   # HTTP_HEADER_SAMPLE = "| Authorization | Bearer {code} |" + NEWLINE + "| Workbook-Session-Id  | Workbook session Id that determines if changes are persisted or not. Optional.|"
-  HTTP_HEADER_SAMPLE =   "| Authorization | Bearer {code} |"
-  ENUM_HEADER =          "| Member       | Value       |" + NEWLINE
+  HTTP_HEADER_SAMPLE =   '| Authorization | Bearer {code} |'.freeze
+  ENUM_HEADER =          '| Member       | Value       |' + NEWLINE
 
-  PREREQ = HEADER2 + "Permissions" + TWONEWLINES + "One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](/graph/permissions-reference)." + TWONEWLINES + \
-           "|Permission type                        | Permissions (from least to most privileged) |" + NEWLINE + \
-           "|:--------------------------------------|:--------------------------------------------|" + NEWLINE + \
-           "|Delegated (work or school account)     | Not supported. |" + NEWLINE + \
-           "|Delegated (personal Microsoft account) | Not supported. |" + NEWLINE + \
-           "|Application                            | Not supported. |" + TWONEWLINES
+  PREREQ = HEADER2 + 'Permissions' + TWONEWLINES + 'One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](/graph/permissions-reference).' + TWONEWLINES + \
+           '|Permission type                        | Permissions (from least to most privileged) |' + NEWLINE + \
+           '|:--------------------------------------|:--------------------------------------------|' + NEWLINE + \
+           '|Delegated (work or school account)     | Not supported. |' + NEWLINE + \
+           '|Delegated (personal Microsoft account) | Not supported. |' + NEWLINE + \
+           '|Application                            | Not supported. |' + TWONEWLINES
 
-  QRY_HEADER = "|Name|Value|Description|"
-  QRY_2nd_LINE = "|:---------------|:--------|:-------|"
-  QRY_EXPAND = "|$expand|string|Comma-separated list of relationships to expand and include in the response. "
-  QRY_FILTER  = "|$filter|string|Filter string that lets you filter the response based on a set of criteria.|"
-  QRY_ORDERBY = "|$orderby|string|Comma-separated list of properties that are used to sort the order of items in the response collection.|"
-  QRY_SELECT = "|$select|string|Comma-separated list of properties to include in the response.|"
-  QRY_SKIPTOKEN = "|$skipToken|string|Paging token that is used to get the next set of results.|"
-  QRY_TOP = "|$top|int|The number of items to return in a result set.|"
-  QRY_SKIP = "|$skip|int|The number of items to skip in a result set.|"
-  QRY_COUNT = "|$count|none|The count of related entities can be requested by specifying the $count query option.|"
+  QRY_HEADER = '|Name|Value|Description|'.freeze
+  QRY_2nd_LINE = '|:---------------|:--------|:-------|'.freeze
+  QRY_EXPAND = '|$expand|string|Comma-separated list of relationships to expand and include in the response. '.freeze
+  QRY_FILTER  = '|$filter|string|Filter string that lets you filter the response based on a set of criteria.|'.freeze
+  QRY_ORDERBY = '|$orderby|string|Comma-separated list of properties that are used to sort the order of items in the response collection.|'.freeze
+  QRY_SELECT = '|$select|string|Comma-separated list of properties to include in the response.|'.freeze
+  QRY_SKIPTOKEN = '|$skipToken|string|Paging token that is used to get the next set of results.|'.freeze
+  QRY_TOP = '|$top|int|The number of items to return in a result set.|'.freeze
+  QRY_SKIP = '|$skip|int|The number of items to skip in a result set.|'.freeze
+  QRY_COUNT = '|$count|none|The count of related entities can be requested by specifying the $count query option.|'.freeze
 
   odata_types = %w[Binary Boolean Byte Date DateTimeOffset Decimal Double Duration
                    Guid Int Int16 Int32 Int64 SByte Single Stream String TimeOfDay
@@ -82,12 +82,12 @@ module SpecMaker
   # Add Owner or Create Owner instead of Add DirectoryObject. Hence, if the
   # collection(datatype) happens to be one the below, we'll use the name in the API name.
   POST_NAME_MAPPING = %w[recipient directoryobject photo
-                         conversationthread recipient privilegedroleassignment item]
+                         conversationthread recipient privilegedroleassignment item].freeze
 
-  TIMESTAMP_DESC = %q{The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: `'2014-01-01T00:00:00Z'`}
+  TIMESTAMP_DESC = "The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: `'2014-01-01T00:00:00Z'`".freeze
 
   # Load the structure
-  JSON_STRUCTURE = "../jsonFiles/template/restresource_structures.json"
+  JSON_STRUCTURE = '../jsonFiles/template/restresource_structures.json'.freeze
   @struct = JSON.parse(File.read(JSON_STRUCTURE, encoding: 'UTF-8'), symbolize_names: true)
   @template = @struct[:object]
   @service = @struct[:serviceSettings]
@@ -99,37 +99,37 @@ module SpecMaker
   @serviceroot = []
 
   HTTP_CODES = {
-    "200" => "OK",
-    "201" => "Created",
-    "202" => "Accepted",
-    "203" => "Non-Authoritative Information",
-    "204" => "No Content",
-    "205" => "Reset Content",
-    "206" => "Partial Content",
-    "300" => "Multiple Choices",
-    "301" => "Moved Permanently",
-    "302" => "Found",
-    "303" => "See Other",
-    "304" => "Not Modified",
-    "306" => "Switch Proxy",
-    "307" => "Temporary Redirect",
-    "308" => "Resume Incomplete"
-  }
+    '200' => 'OK',
+    '201' => 'Created',
+    '202' => 'Accepted',
+    '203' => 'Non-Authoritative Information',
+    '204' => 'No Content',
+    '205' => 'Reset Content',
+    '206' => 'Partial Content',
+    '300' => 'Multiple Choices',
+    '301' => 'Moved Permanently',
+    '302' => 'Found',
+    '303' => 'See Other',
+    '304' => 'Not Modified',
+    '306' => 'Switch Proxy',
+    '307' => 'Temporary Redirect',
+    '308' => 'Resume Incomplete'
+  }.freeze
 
   # UUID_DATE = "<!-- uuid: " + SecureRandom.uuid  + "\n" + Time.now.utc.to_s + " -->"
-  UUID_DATE = "<!-- uuid: " + "8fcb5dbc-d5aa-4681-8e31-b001d5168d79" + "\n" + "2015-10-25 14:57:30 UTC" + " -->"
+  UUID_DATE = '<!-- uuid: ' + '8fcb5dbc-d5aa-4681-8e31-b001d5168d79' + "\n" + '2015-10-25 14:57:30 UTC' + ' -->'
 
   # Log file
-  LOG_FOLDER = '../logs'
+  LOG_FOLDER = '../logs'.freeze
   Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
-  LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
+  LOG_FILE = File.basename($PROGRAM_NAME, '.rb') + '.txt';
   File.delete("#{LOG_FOLDER}/#{LOG_FILE}") if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger.level = Logger::DEBUG
   # End log file
 
-  Dir.mkdir("../markdown") unless File.exist?("../markdown")
+  Dir.mkdir('../markdown') unless File.exist?('../markdown')
   Dir.mkdir(MARKDOWN_BASE_FOLDER) unless File.exist?(MARKDOWN_BASE_FOLDER)
 
   Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exist?(MARKDOWN_RESOURCE_FOLDER)
@@ -157,11 +157,11 @@ module SpecMaker
   Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exist?(MARKDOWN_RESOURCE_FOLDER)
 
   if !File.exist?(JSON_SOURCE_FOLDER)
-    @logger.fatal("JSON Resource File folder does not exist. Aborting")
+    @logger.fatal('JSON Resource File folder does not exist. Aborting')
     abort("*** FATAL ERROR *** Input JSON resource folder: #{JSON_SOURCE_FOLDER} doesn't exist. Correct and re-run.")
   end
 
-  @logger.warn("API examples folder does not exist") if !File.exist?(EXAMPLES_FOLDER)
+  @logger.warn('API examples folder does not exist') if !File.exist?(EXAMPLES_FOLDER)
 
   ##
   # Load up all the known existing annotations.
@@ -188,7 +188,7 @@ module SpecMaker
   @mdlines = []
   @resource = ''
 
-  def self.uncapitalize(str = "")
+  def self.uncapitalize(str = '')
     if str.length > 0
       str[0, 1].downcase + str[1..-1]
     else
@@ -217,9 +217,9 @@ module SpecMaker
     if NUMERICTYPES.include? dataType.downcase
       return 99
     elsif DATETYPES.include? dataType.downcase
-      return "datetime-value"
+      return 'datetime-value'
     elsif %w[Url url].include? dataType.downcase
-      return "url-value"
+      return 'url-value'
     elsif %w[Boolean boolean Bool bool].include? dataType
       return true
     elsif SIMPLETYPES.include? dataType.downcase
@@ -252,7 +252,7 @@ module SpecMaker
           # end
         end
       rescue SystemStackError
-        model[:err] = "SystemStackError"
+        model[:err] = 'SystemStackError'
       end
     end
 
@@ -269,9 +269,9 @@ module SpecMaker
     if NUMERICTYPES.include? dataType.downcase
       return 99
     elsif DATETYPES.include? dataType.downcase
-      return "datetime-value"
+      return 'datetime-value'
     elsif %w[Url url].include? dataType.downcase
-      return "url-value"
+      return 'url-value'
     elsif %w[Boolean boolean Bool bool].include? dataType.downcase
       return true
     elsif SIMPLETYPES.include? dataType.downcase
@@ -313,8 +313,8 @@ module SpecMaker
         model[item[:name]] = [model[item[:name]]] if item[:isCollection]
       end
     end
-    model = { "value" => [model] } if collFlag
-    model = { "#{objectName}" => model } if isOpenType && openTypeReq
+    model = { 'value' => [model] } if collFlag
+    model = { objectName.to_s => model } if isOpenType && openTypeReq
     return JSON.pretty_generate model, max_nesting: false
   end
 
@@ -337,15 +337,15 @@ module SpecMaker
       model[item[:name]] = if NUMERICTYPES.include? item[:dataType].downcase
                              1024
                            elsif DATETYPES.include? item[:dataType].downcase
-                             "String (timestamp)"
+                             'String (timestamp)'
                            elsif %w[Url url].include? item[:dataType]
-                             "url"
+                             'url'
                            elsif %w[Boolean boolean Bool bool].include? item[:dataType]
                              true
                            elsif SIMPLETYPES.include? item[:dataType].downcase
-                             "#{item[:dataType]}"
+                             (item[:dataType]).to_s
                            else
-                             { "@odata.type" => "#{@service[:namespace]}.#{item[:dataType]}" }
+                             { '@odata.type' => "#{@service[:namespace]}.#{item[:dataType]}" }
                            end
 
       model[item[:name]] = model[item[:name]] + ' (identifier)' if item[:isKey]
@@ -355,23 +355,23 @@ module SpecMaker
     return JSON.pretty_generate model
   end
 
-  def self.get_json_model_pretext(objectName = "", properties = [], baseType = "")
+  def self.get_json_model_pretext(objectName = '', properties = [], baseType = '')
     model = deep_copy(@mdresource)
-    model["@odata.type"] = "#{@service[:namespace]}.#{objectName}"
-    model["baseType"] = baseType
+    model['@odata.type'] = "#{@service[:namespace]}.#{objectName}"
+    model['baseType'] = baseType
     properties.each do |item|
       next if item[:isRelationship]
 
       model[:optionalProperties].push item[:name] if item[:isNullable] || item[:isRelationship]
 
-      model["keyProperty"] = item[:name] if item[:isKey]
+      model['keyProperty'] = item[:name] if item[:isKey]
     end
-    return "<!-- " + (JSON.pretty_generate model) + "-->"
+    return '<!-- ' + (JSON.pretty_generate model) + '-->'
   end
 
   def self.pretty_json(input = nil)
-    output = ""
-    save = ""
+    output = ''
+    save = ''
     input.split("\n").each do |line|
       if (line[0..0] == '{')
         output = output + line
@@ -379,14 +379,14 @@ module SpecMaker
       end
       if (line[0..0] == '}')
         output = output + save + NEWLINE
-        save = "" # not required...
+        save = '' # not required...
         output = output + line
         next
       end
       if line[2..2] == '"'
         output = output + save + NEWLINE
         output = output + line
-        save = ""
+        save = ''
         next
       end
       save = save + line.strip
@@ -397,27 +397,27 @@ module SpecMaker
   def self.get_json_page_annotation(description = nil)
     model = deep_copy(@mdpageannotate)
     model[:description] = description
-    return "<!-- " + (JSON.pretty_generate model) + "-->"
+    return '<!-- ' + (JSON.pretty_generate model) + '-->'
   end
 
   def self.get_json_request_pretext(name = nil)
     model = deep_copy(@mdrequest)
     model[:name] = name
-    return "<!-- " + (JSON.pretty_generate model) + "-->"
+    return '<!-- ' + (JSON.pretty_generate model) + '-->'
   end
 
   def self.get_json_response_pretext(type = nil, isArray = false)
     model = deep_copy(@mdresponse)
     if type == nil || type == 'none'
     else
-      model["@odata.type"] = if SIMPLETYPES.include? type
+      model['@odata.type'] = if SIMPLETYPES.include? type
                                type
                              else
                                "#{@service[:namespace]}.#{type}"
                              end
       model[:isCollection] = true if isArray
     end
-    return "<!-- " + (JSON.pretty_generate model) + " -->"
+    return '<!-- ' + (JSON.pretty_generate model) + ' -->'
   end
 
   def self.sanitize_file_name(fileName)

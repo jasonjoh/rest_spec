@@ -332,7 +332,6 @@ Style/IfUnlessModifier:
 Style/MultipleComparison:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 43
 # Cop supports --auto-correct.
@@ -341,7 +340,6 @@ Style/MutableConstant:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 9
 # Cop supports --auto-correct.
@@ -470,7 +468,6 @@ Style/StringLiterals:
     - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -486,13 +483,6 @@ Style/StringLiteralsInInterpolation:
 Style/UnneededInterpolation:
   Exclude:
     - 'report_delta_edits.rb'
-    - 'utils_j2m.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/UnneededPercentQ:
-  Exclude:
-    - 'utils_j2m.rb'
 
 # Offense count: 12
 # Cop supports --auto-correct.
