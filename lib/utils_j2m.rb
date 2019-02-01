@@ -63,11 +63,11 @@ module SpecMaker
   QRY_COUNT = "|$count|none|The count of related entities can be requested by specifying the $count query option.|"
 
   odata_types = %w[Binary Boolean Byte Date DateTimeOffset Decimal Double Duration
-        Guid Int Int16 Int32 Int64 SByte Single Stream String TimeOfDay
-        Geography GeographyPoint GeographyLineString GeographyPolygon GeographyMultiPoint
-        GeographyMultiLineString GeographyMultiPolygon GeographyCollection Geometry
-        GeometryPoint GeometryLineString GeometryPolygon GeometryMultiPoint GeometryMultiLineString
-        GeometryMultiPolygon GeometryCollection Octet-Stream Octet Url Json]
+                   Guid Int Int16 Int32 Int64 SByte Single Stream String TimeOfDay
+                   Geography GeographyPoint GeographyLineString GeographyPolygon GeographyMultiPoint
+                   GeographyMultiLineString GeographyMultiPolygon GeographyCollection Geometry
+                   GeometryPoint GeometryLineString GeometryPolygon GeometryMultiPoint GeometryMultiLineString
+                   GeometryMultiPolygon GeometryCollection Octet-Stream Octet Url Json]
 
   numeric_types = %w[Byte Decimal Double Int Int16 Int32 Int64]
   datetime_types = %w[Date DateTimeOffset Duration TimeOfDay]
@@ -80,9 +80,9 @@ module SpecMaker
   # e.g: <NavigationProperty Name="owners" Type="Collection(Microsoft.Graph.DirectoryObject)" />
   # For POST /Collection, we want to use a name that's sensible such as
   # Add Owner or Create Owner instead of Add DirectoryObject. Hence, if the
-    # collection(datatype) happens to be one the below, we'll use the name in the API name.
+  # collection(datatype) happens to be one the below, we'll use the name in the API name.
   POST_NAME_MAPPING = %w[recipient directoryobject photo
-            conversationthread recipient privilegedroleassignment item]
+                         conversationthread recipient privilegedroleassignment item]
 
   TIMESTAMP_DESC = %q{The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: `'2014-01-01T00:00:00Z'`}
 
@@ -131,7 +131,6 @@ module SpecMaker
   @logger.level = Logger::DEBUG
   # End log file
 
-#
   Dir.mkdir("../markdown") unless File.exist?("../markdown")
   Dir.mkdir(MARKDOWN_BASE_FOLDER) unless File.exist?(MARKDOWN_BASE_FOLDER)
 
@@ -141,7 +140,6 @@ module SpecMaker
   Dir.mkdir(MARKDOWN_API_FOLDER) unless File.exist?(MARKDOWN_API_FOLDER)
   FileUtils.rm Dir.glob(MARKDOWN_API_FOLDER + '/*')
 
-#
 
 
   ###
@@ -465,5 +463,5 @@ module SpecMaker
     return fileName.gsub('_', '-')
   end
 
-# module end
+  # module end
 end
