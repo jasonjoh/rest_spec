@@ -32,7 +32,6 @@ Layout/EmptyComment:
 Layout/EmptyLineAfterGuardClause:
   Exclude:
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 8
 # Cop supports --auto-correct.
@@ -40,7 +39,6 @@ Layout/EmptyLines:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -49,7 +47,6 @@ Layout/EmptyLines:
 Layout/EmptyLinesAroundBlockBody:
   Exclude:
     - 'report_delta_edits.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 8
 # Cop supports --auto-correct.
@@ -57,7 +54,6 @@ Layout/EmptyLinesAroundMethodBody:
   Exclude:
     - 'diff_two_versions.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 5
 # Cop supports --auto-correct.
@@ -94,15 +90,6 @@ Layout/ExtraSpacing:
   Exclude:
     - 'diff_two_versions.rb'
     - 'edmx2json.rb'
-    - 'utils_j2m.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: special_inside_parentheses, consistent, align_braces
-Layout/IndentHash:
-  Exclude:
-    - 'utils_j2m.rb'
 
 # Offense count: 5
 # Cop supports --auto-correct.
@@ -129,7 +116,6 @@ Layout/LeadingCommentSpace:
     - 'diff_two_versions.rb'
     - 'edmx2json.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -138,14 +124,6 @@ Layout/LeadingCommentSpace:
 Layout/MultilineMethodCallBraceLayout:
   Exclude:
     - 'edmx2json.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: aligned, indented
-Layout/MultilineOperationIndentation:
-  Exclude:
-    - 'utils_j2m.rb'
 
 # Offense count: 4
 # Cop supports --auto-correct.
@@ -160,7 +138,6 @@ Layout/SpaceAfterMethodName:
   Exclude:
     - 'diff_two_versions.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 56
 # Cop supports --auto-correct.
@@ -171,7 +148,6 @@ Layout/SpaceAroundEqualsInParameterDefault:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.

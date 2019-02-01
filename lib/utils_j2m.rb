@@ -20,9 +20,9 @@ module SpecMaker
   HEADER3 = '### '
   HEADER4 = '#### '
   HEADER5 = '##### '
-  #BACKTOMETHOD = '[Back](#methods)'
+  # BACKTOMETHOD = '[Back](#methods)'
   NEWLINE = "\n"
-  #BACKTOPROPERTY = NEWLINE + '[Back](#properties)'
+  # BACKTOPROPERTY = NEWLINE + '[Back](#properties)'
   PIPE = '|'
   TWONEWLINES = "\n\n"
 
@@ -45,11 +45,11 @@ module SpecMaker
   ENUM_HEADER =          "| Member       | Value       |" + NEWLINE
 
   PREREQ = HEADER2 + "Permissions" + TWONEWLINES + "One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](/graph/permissions-reference)." + TWONEWLINES + \
-      "|Permission type                        | Permissions (from least to most privileged) |" + NEWLINE + \
-      "|:--------------------------------------|:--------------------------------------------|" + NEWLINE + \
-      "|Delegated (work or school account)     | Not supported. |" + NEWLINE + \
-      "|Delegated (personal Microsoft account) | Not supported. |" + NEWLINE + \
-      "|Application                            | Not supported. |" + TWONEWLINES
+           "|Permission type                        | Permissions (from least to most privileged) |" + NEWLINE + \
+           "|:--------------------------------------|:--------------------------------------------|" + NEWLINE + \
+           "|Delegated (work or school account)     | Not supported. |" + NEWLINE + \
+           "|Delegated (personal Microsoft account) | Not supported. |" + NEWLINE + \
+           "|Application                            | Not supported. |" + TWONEWLINES
 
   QRY_HEADER = "|Name|Value|Description|"
   QRY_2nd_LINE = "|:---------------|:--------|:-------|"
@@ -99,25 +99,25 @@ module SpecMaker
   @serviceroot = []
 
   HTTP_CODES = {
-          "200" => "OK",
-          "201" => "Created",
-          "202" => "Accepted",
-          "203" => "Non-Authoritative Information",
-          "204" => "No Content",
-          "205" => "Reset Content",
-          "206" => "Partial Content",
-          "300" => "Multiple Choices",
-          "301" => "Moved Permanently",
-          "302" => "Found",
-          "303" => "See Other",
-          "304" => "Not Modified",
-          "306" => "Switch Proxy",
-          "307" => "Temporary Redirect",
-          "308" => "Resume Incomplete"
-        }
+    "200" => "OK",
+    "201" => "Created",
+    "202" => "Accepted",
+    "203" => "Non-Authoritative Information",
+    "204" => "No Content",
+    "205" => "Reset Content",
+    "206" => "Partial Content",
+    "300" => "Multiple Choices",
+    "301" => "Moved Permanently",
+    "302" => "Found",
+    "303" => "See Other",
+    "304" => "Not Modified",
+    "306" => "Switch Proxy",
+    "307" => "Temporary Redirect",
+    "308" => "Resume Incomplete"
+  }
 
-  #UUID_DATE = "<!-- uuid: " + SecureRandom.uuid  + "\n" + Time.now.utc.to_s + " -->"
-  UUID_DATE = "<!-- uuid: " + "8fcb5dbc-d5aa-4681-8e31-b001d5168d79"  + "\n" + "2015-10-25 14:57:30 UTC" + " -->"
+  # UUID_DATE = "<!-- uuid: " + SecureRandom.uuid  + "\n" + Time.now.utc.to_s + " -->"
+  UUID_DATE = "<!-- uuid: " + "8fcb5dbc-d5aa-4681-8e31-b001d5168d79" + "\n" + "2015-10-25 14:57:30 UTC" + " -->"
 
   # Log file
   LOG_FOLDER = '../logs'
@@ -140,8 +140,6 @@ module SpecMaker
   Dir.mkdir(MARKDOWN_API_FOLDER) unless File.exist?(MARKDOWN_API_FOLDER)
   FileUtils.rm Dir.glob(MARKDOWN_API_FOLDER + '/*')
 
-
-
   ###
   # To prevent shallow copy errors, need to get a new object each time.
   #
@@ -156,7 +154,6 @@ module SpecMaker
   @method_files_created = 0
   @ientityset = 0
   @list_from_rel = 0
-
 
   # Create markdown folder if it doesn't already exist
   Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exist?(MARKDOWN_RESOURCE_FOLDER)
@@ -195,7 +192,7 @@ module SpecMaker
   @mdlines = []
   @resource = ''
 
-  def self.uncapitalize (str="")
+  def self.uncapitalize(str = "")
     if str.length > 0
       str[0, 1].downcase + str[1..-1]
     else
@@ -207,7 +204,7 @@ module SpecMaker
     return UUID_DATE
   end
 
-  def self.get_create_description(objectName=nil, use_name = nil)
+  def self.get_create_description(objectName = nil, use_name = nil)
     createDescription = ''
     fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
     if File.file?(fullpath)
@@ -218,8 +215,7 @@ module SpecMaker
     return createDescription
   end
 
-  def self.assign_value (dataType=nil, name='')
-
+  def self.assign_value(dataType = nil, name = '')
     if dataType.downcase.start_with?('extension')
       return {}
     end
@@ -239,7 +235,7 @@ module SpecMaker
     end
   end
 
-  def self.dump_complex_type(ct=nil)
+  def self.dump_complex_type(ct = nil)
     model={}
     fullpath = JSON_SOURCE_FOLDER + '/' + ct.downcase + '.json'
     if File.file?(fullpath)
@@ -248,7 +244,7 @@ module SpecMaker
         object[:properties].each do |item|
           if item[:name].downcase.start_with?('extension')
             next
-            #model[item[:name]] = {}
+            # model[item[:name]] = {}
           else
             model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship])
             if item[:isCollection]
@@ -269,8 +265,7 @@ module SpecMaker
     return model
   end
 
-  def self.assign_value2 (dataType=nil, name='', isRel=false)
-
+  def self.assign_value2(dataType = nil, name = '', isRel = false)
     if isRel
       return {}
     end
@@ -298,7 +293,7 @@ module SpecMaker
     end
   end
 
-  def self.get_json_model_method (objectName=nil, collFlag=false, includeKey=true, openTypeReq = false)
+  def self.get_json_model_method(objectName = nil, collFlag = false, includeKey = true, openTypeReq = false)
     model = {}
     if SIMPLETYPES.include? objectName
       model[:value] = assign_value(objectName, objectName)
@@ -319,6 +314,7 @@ module SpecMaker
       object[:properties].each_with_index do |item, i|
         next if item[:isRelationship]
         next if i > 5
+
         if !includeKey
           next if item[:isKey]
         end
@@ -342,8 +338,7 @@ module SpecMaker
     return JSON.pretty_generate model, { :max_nesting => false }
   end
 
-  def self.get_json_model_params(params=[])
-
+  def self.get_json_model_params(params = [])
     model={}
 
     params.each do |item|
@@ -356,7 +351,7 @@ module SpecMaker
     return JSON.pretty_generate model, { :max_nesting => false }
   end
 
-  def self.get_json_model (properties=[])
+  def self.get_json_model(properties = [])
     model = {}
     properties.each do |item|
       next if item[:isRelationship]
@@ -388,12 +383,11 @@ module SpecMaker
     return JSON.pretty_generate model
   end
 
-  def self.get_json_model_pretext (objectName="", properties=[], baseType="")
+  def self.get_json_model_pretext(objectName = "", properties = [], baseType = "")
     model = deep_copy(@mdresource)
     model["@odata.type"] = "#{@service[:namespace]}.#{objectName}"
     model["baseType"] = baseType
     properties.each do |item|
-
       next if item[:isRelationship]
 
       if item[:isNullable] || item[:isRelationship]
@@ -412,13 +406,13 @@ module SpecMaker
     save = ""
     input.split("\n").each do |line|
       if (line[0..0] == '{')
-        output = output  + line
+        output = output + line
         next
       end
       if (line[0..0] == '}')
         output = output + save + NEWLINE
         save = "" # not required...
-        output = output +  line
+        output = output + line
         next
       end
       if line[2..2] == '"'
@@ -432,20 +426,19 @@ module SpecMaker
     return output
   end
 
-  def self.get_json_page_annotation (description=nil)
+  def self.get_json_page_annotation(description = nil)
     model = deep_copy(@mdpageannotate)
     model[:description] = description
     return "<!-- " + (JSON.pretty_generate model) + "-->"
   end
 
-  def self.get_json_request_pretext (name=nil)
+  def self.get_json_request_pretext(name = nil)
     model = deep_copy(@mdrequest)
     model[:name] = name
     return "<!-- " + (JSON.pretty_generate model) + "-->"
-
   end
 
-  def self.get_json_response_pretext (type=nil, isArray=false)
+  def self.get_json_response_pretext(type = nil, isArray = false)
     model = deep_copy(@mdresponse)
     if type == nil || type == 'none'
     else
@@ -459,7 +452,7 @@ module SpecMaker
     return "<!-- " + (JSON.pretty_generate model) + " -->"
   end
 
-  def self.sanitize_file_name (fileName)
+  def self.sanitize_file_name(fileName)
     return fileName.gsub('_', '-')
   end
 
