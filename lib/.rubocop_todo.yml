@@ -208,7 +208,6 @@ Metrics/BlockNesting:
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
 Naming/UncommunicativeBlockParamName:
   Exclude:
-    - 'edmx2json.rb'
     - 'utils_e2j.rb'
 
 # Offense count: 34
@@ -224,7 +223,6 @@ Naming/UncommunicativeMethodParamName:
 Naming/VariableName:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
 
@@ -258,7 +256,6 @@ Style/BracesAroundHashParameters:
 # SupportedStyles: assign_to_condition, assign_inside_condition
 Style/ConditionalAssignment:
   Exclude:
-    - 'edmx2json.rb'
     - 'utils_e2j.rb'
 
 # Offense count: 1
@@ -280,14 +277,8 @@ Style/GuardClause:
 Style/HashSyntax:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-
-# Offense count: 1
-Style/IfInsideElse:
-  Exclude:
-    - 'edmx2json.rb'
 
 # Offense count: 34
 # Cop supports --auto-correct.
@@ -316,7 +307,6 @@ Style/MutableConstant:
 Style/NegatedIf:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'edmx2json.rb'
     - 'utils_e2j.rb'
 
 # Offense count: 9
@@ -326,7 +316,6 @@ Style/NegatedIf:
 Style/NestedParenthesizedCalls:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'edmx2json.rb'
     - 'utils_e2j.rb'
 
 # Offense count: 1
@@ -360,7 +349,6 @@ Style/ParallelAssignment:
 # SupportedStyles: short, verbose
 Style/PreferredHashMethods:
   Exclude:
-    - 'edmx2json.rb'
     - 'utils_e2j.rb'
 
 # Offense count: 6
@@ -381,7 +369,6 @@ Style/RedundantReturn:
 Style/SelfAssignment:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
 
@@ -399,7 +386,6 @@ Style/Semicolon:
 Style/StringLiterals:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
 
@@ -409,7 +395,6 @@ Style/StringLiterals:
 # SupportedStyles: single_quotes, double_quotes
 Style/StringLiteralsInInterpolation:
   Exclude:
-    - 'edmx2json.rb'
     - 'utils_e2j.rb'
 
 # Offense count: 4
