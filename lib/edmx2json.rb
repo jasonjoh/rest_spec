@@ -40,7 +40,7 @@ module SpecMaker
   end
 
   # Convert to JSON format.
-  csdl=JSON.parse(Hash.from_xml(metadata).to_json, {:symbolize_names => true})
+  csdl = JSON.parse(Hash.from_xml(metadata).to_json, :symbolize_names => true)
   File.open("#{CSDL_LOCATION}metadata.json", "w") do |f|
     f.write(JSON.pretty_generate csdl, :encoding => 'UTF-8')
   end
@@ -121,9 +121,9 @@ module SpecMaker
       process_method(item, 'function')
     end
   elsif schema[:Function].is_a?(Hash)
-      puts "-> Processing Function (hash) #{schema[:Function][:Name]}, #{schema[:Function]}"
-      @ifunction = @ifunction + 1
-      process_method(schema[:Function][:Name], 'function')
+    puts "-> Processing Function (hash) #{schema[:Function][:Name]}, #{schema[:Function]}"
+    @ifunction = @ifunction + 1
+    process_method(schema[:Function][:Name], 'function')
   end
 
   # Write Functions & Actions
@@ -187,7 +187,7 @@ module SpecMaker
       baseType = entity[:BaseType][(entity[:BaseType].rindex('.') + 1)..-1]
 
       BASETYPE_MAPPING.each do |k, v|
-         if k.downcase == baseType.downcase
+        if k.casecmp(baseType).zero?
           puts "------> Mapping BaseType #{baseType} back to #{v}"
           baseType = camelcase v
         end
@@ -202,10 +202,12 @@ module SpecMaker
 
         entity[:Property] = merge_members(
           entity[:Property],
-          @base_types[baseType.to_sym][:Property])
-        entity[:NavigationProperty]  = merge_members(
+          @base_types[baseType.to_sym][:Property]
+        )
+        entity[:NavigationProperty] = merge_members(
           entity[:NavigationProperty],
-          @base_types[baseType.to_sym][:NavigationProperty])
+          @base_types[baseType.to_sym][:NavigationProperty]
+        )
         @base_types[entity[:Name].to_sym] = deep_copy(entity)
       end
     end
@@ -216,7 +218,7 @@ module SpecMaker
     elsif !entity[:Key].nil? && entity[:Key][:PropertyRef].is_a?(Array)
       @key_save = ""
       entity[:Key][:PropertyRef].each do |innerItem|
-        @key_save =  innerItem[:Name] + ' ' + @key_save
+        @key_save = innerItem[:Name] + ' ' + @key_save
       end
     end
 
@@ -248,12 +250,12 @@ module SpecMaker
       @json_object[:methods] = @methods[@json_object[:name].downcase.to_sym]
       if !baseType.nil? && @methods.has_key?(baseType.downcase.to_sym)
         @json_object[:methods].concat @methods[baseType.downcase.to_sym]
-        #create_basetype_examplefiles(@methods[baseType.to_sym], @json_object[:name])
+        # create_basetype_examplefiles(@methods[baseType.to_sym], @json_object[:name])
       end
     else
       if !baseType.nil? && @methods.has_key?(baseType.downcase.to_sym)
         @json_object[:methods] = @methods[baseType.downcase.to_sym]
-        #create_basetype_examplefiles(@methods[baseType.to_sym], @json_object[:name])
+        # create_basetype_examplefiles(@methods[baseType.to_sym], @json_object[:name])
       end
     end
 
@@ -263,7 +265,7 @@ module SpecMaker
       f.write(JSON.pretty_generate @json_object, :encoding => 'UTF-8')
     end
     # if !@json_object[:isComplexType]
-    # 	create_auto_examplefiles((@json_object[:name]).downcase, false)
+    #   create_auto_examplefiles((@json_object[:name]).downcase, false)
     # end
     GC.start
   end
@@ -279,7 +281,7 @@ module SpecMaker
     puts "-> Processing EntitySet Type #{entity[:Name]}"
     @json_object[:name] = camelcase entity[:Name]
     @json_object[:isEntitySet] = true
-    #dt = entity[:EntityType][(entity[:EntityType].rindex('.') + 1)..-1].chomp(')')
+    # dt = entity[:EntityType][(entity[:EntityType].rindex('.') + 1)..-1].chomp(')')
     dt = get_type(entity[:EntityType])
     @json_object[:collectionOf] = dt
 
@@ -296,13 +298,13 @@ module SpecMaker
     @json_object[:updateDescription] = nil
     @json_object[:deleteDescription] = nil
 
-    @json_object[:restPath] = {"/#{@json_object[:name]}" => true }
+    @json_object[:restPath] = { "/#{@json_object[:name]}" => true }
 
     fileName = (@json_object[:name]).downcase + '_' + dt.downcase + '_collection.json'
     File.open("#{JSON_SOURCE_FOLDER}#{fileName}", "w") do |f|
       f.write(JSON.pretty_generate @json_object, :encoding => 'UTF-8')
     end
-    #create_auto_examplefiles((@json_object[:name]).downcase, true)
+    # create_auto_examplefiles((@json_object[:name]).downcase, true)
 
     fill_rest_path("/#{(@json_object[:name])}", dt, true)
 
@@ -338,9 +340,9 @@ module SpecMaker
   puts "Navigation Properties: #{@inprop}"
   puts "Actions: #{@iaction}"
   puts "Functions: #{@ifunction}"
-  #puts "--> Example files written: #{@iexampleFilesWrittem}"
+  # puts "--> Example files written: #{@iexampleFilesWrittem}"
   puts "Parameters: #{@iparam}"
   puts "Enums: #{@ienums}"
-  #puts "Collections: #{@icollection}"
+  # puts "Collections: #{@icollection}"
   puts "EntitySet: #{@ientityset}"
 end
