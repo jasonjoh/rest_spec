@@ -24,3 +24,6 @@ Metrics/LineLength:
 
 Style/IdenticalConditionalBranches:
   Enabled: false
+
+Metrics/BlockLength:
+  Max: 35

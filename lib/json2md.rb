@@ -689,14 +689,12 @@ module SpecMaker
         properties.each do |prop|
           next unless prop[:isRelationship] && prop[:isCollection] && prop[:allowPostToCollection]
 
-          if SIMPLETYPES.include?(prop[:dataType]) ||
-              POST_NAME_MAPPING.include?(prop[:dataType].downcase)
-            use_name = prop[:name].chomp('s')
-            post_name = 'Create ' + use_name
-          else
-            use_name = prop[:dataType]
-            post_name = 'Create ' + use_name
-          end
+          use_name = if SIMPLETYPES.include?(prop[:dataType]) || POST_NAME_MAPPING.include?(prop[:dataType].downcase)
+                       prop[:name].chomp('s')
+                     else
+                       prop[:dataType]
+                     end
+          post_name = 'Create ' + use_name
           file_name = sanitize_file_name("#{@json_hash[:name].downcase}-post-#{prop[:name].downcase}.md")
           post_link = "../api/#{file_name}"
           return_link = if SIMPLETYPES.include? prop[:dataType]
@@ -715,7 +713,7 @@ module SpecMaker
 
             mtd[:parameters] = nil
             mtd[:httpSuccessCode] = '201'
-            create_method_mdfile(mtd, sanitize_file_name("#{@json_hash[:name].downcase}-post-#{prop[:name].downcase}.md"), prop[:name])
+            create_method_mdfile(mtd, file_name, prop[:name])
           end
 
           # Add List method.
@@ -916,7 +914,8 @@ module SpecMaker
   ###
   processed_files = 0
   Dir.foreach(JSON_SOURCE_FOLDER) do |item|
-    next if item == '.' or item == '..'
+    next if ['.', '..'].include?(item)
+
     fullpath = JSON_SOURCE_FOLDER + item.downcase
 
     if File.file?(fullpath)
