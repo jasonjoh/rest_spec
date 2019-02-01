@@ -149,12 +149,6 @@ Layout/SpaceAroundEqualsInParameterDefault:
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Layout/SpaceAroundKeyword:
-  Exclude:
-    - 'utils_j2m.rb'
-
 # Offense count: 11
 # Cop supports --auto-correct.
 # Configuration parameters: AllowForAlignment.
@@ -163,7 +157,6 @@ Layout/SpaceAroundOperators:
     - 'diff_two_versions.rb'
     - 'edmx2json.rb'
     - 'report_delta_edits.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 4
 # Cop supports --auto-correct.
@@ -194,21 +187,6 @@ Layout/SpaceInsideHashLiteralBraces:
     - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: space, no_space
-Layout/SpaceInsideParens:
-  Exclude:
-    - 'utils_j2m.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Layout/SpaceInsidePercentLiteralDelimiters:
-  Exclude:
-    - 'utils_j2m.rb'
 
 # Offense count: 12
 # Cop supports --auto-correct.
@@ -256,11 +234,6 @@ Metrics/BlockLength:
 Metrics/BlockNesting:
   Max: 4
 
-# Offense count: 1
-Naming/ConstantName:
-  Exclude:
-    - 'utils_j2m.rb'
-
 # Offense count: 4
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
 Naming/UncommunicativeBlockParamName:
@@ -274,7 +247,6 @@ Naming/UncommunicativeBlockParamName:
 Naming/UncommunicativeMethodParamName:
   Exclude:
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 61
 # Configuration parameters: EnforcedStyle.
@@ -285,7 +257,6 @@ Naming/VariableName:
     - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -293,12 +264,6 @@ Performance/Casecmp:
   Exclude:
     - 'edmx2json.rb'
     - 'utils_e2j.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Performance/StringReplacement:
-  Exclude:
-    - 'utils_j2m.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -318,7 +283,6 @@ Style/BracesAroundHashParameters:
     - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 11
 # Cop supports --auto-correct.

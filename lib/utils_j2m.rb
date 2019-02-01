@@ -88,7 +88,7 @@ module SpecMaker
 
   # Load the structure
   JSON_STRUCTURE = "../jsonFiles/template/restresource_structures.json"
-  @struct = JSON.parse(File.read(JSON_STRUCTURE, :encoding => 'UTF-8'), {:symbolize_names => true})
+  @struct = JSON.parse(File.read(JSON_STRUCTURE, :encoding => 'UTF-8'), :symbolize_names => true)
   @template = @struct[:object]
   @service = @struct[:serviceSettings]
   @mdresource = @struct[:mdresource]
@@ -160,7 +160,7 @@ module SpecMaker
 
   if !File.exist?(JSON_SOURCE_FOLDER)
     @logger.fatal("JSON Resource File folder does not exist. Aborting")
-    abort("*** FATAL ERROR *** Input JSON resource folder: #{JSON_SOURCE_FOLDER} doesn't exist. Correct and re-run." )
+    abort("*** FATAL ERROR *** Input JSON resource folder: #{JSON_SOURCE_FOLDER} doesn't exist. Correct and re-run.")
   end
 
   if !File.exist?(EXAMPLES_FOLDER)
@@ -208,7 +208,7 @@ module SpecMaker
     createDescription = ''
     fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
     if File.file?(fullpath)
-      object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
+      object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
       createDescription = object[:createDescription]
     end
     createDescription = "Use this API to create a new #{use_name || objectName}." if createDescription.empty?
@@ -225,8 +225,8 @@ module SpecMaker
     elsif DATETYPES.include? dataType.downcase
       return "datetime-value"
     elsif %w[Url url].include? dataType.downcase
-      return"url-value"
-    elsif %w[Boolean boolean Bool bool ].include? dataType
+      return "url-value"
+    elsif %w[Boolean boolean Bool bool].include? dataType
       return true
     elsif SIMPLETYPES.include? dataType.downcase
       return "#{name}-value"
@@ -236,11 +236,11 @@ module SpecMaker
   end
 
   def self.dump_complex_type(ct = nil)
-    model={}
+    model = {}
     fullpath = JSON_SOURCE_FOLDER + '/' + ct.downcase + '.json'
     if File.file?(fullpath)
       begin
-        object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
+        object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
         object[:properties].each do |item|
           if item[:name].downcase.start_with?('extension')
             next
@@ -283,8 +283,8 @@ module SpecMaker
     elsif DATETYPES.include? dataType.downcase
       return "datetime-value"
     elsif %w[Url url].include? dataType.downcase
-      return"url-value"
-    elsif %w[Boolean boolean Bool bool ].include? dataType.downcase
+      return "url-value"
+    elsif %w[Boolean boolean Bool bool].include? dataType.downcase
       return true
     elsif SIMPLETYPES.include? dataType.downcase
       return "#{name}-value"
@@ -307,7 +307,7 @@ module SpecMaker
     isOpenType = false
     fullpath = JSON_SOURCE_FOLDER + '/' + objectName.downcase + '.json'
     if File.file?(fullpath)
-      object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
+      object = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
       if object[:isOpenType]
         isOpenType = true
       end
@@ -330,16 +330,16 @@ module SpecMaker
       end
     end
     if collFlag
-      model = {"value" => [model]}
+      model = { "value" => [model] }
     end
     if isOpenType && openTypeReq
       model = { "#{objectName}" => model }
     end
-    return JSON.pretty_generate model, { :max_nesting => false }
+    return JSON.pretty_generate model, :max_nesting => false
   end
 
   def self.get_json_model_params(params = [])
-    model={}
+    model = {}
 
     params.each do |item|
       model[item[:name]] = assign_value(item[:dataType], item[:name])
@@ -348,7 +348,7 @@ module SpecMaker
       end
     end
 
-    return JSON.pretty_generate model, { :max_nesting => false }
+    return JSON.pretty_generate model, :max_nesting => false
   end
 
   def self.get_json_model(properties = [])
@@ -362,12 +362,12 @@ module SpecMaker
         model[item[:name]] = "String (timestamp)"
       elsif %w[Url url].include? item[:dataType]
         model[item[:name]] = "url"
-      elsif %w[Boolean boolean Bool bool ].include? item[:dataType]
+      elsif %w[Boolean boolean Bool bool].include? item[:dataType]
         model[item[:name]] = true
       elsif SIMPLETYPES.include? item[:dataType].downcase
         model[item[:name]] = "#{item[:dataType]}"
       else
-        model[item[:name]] = { "@odata.type" => "#{@service[:namespace]}.#{item[:dataType]}"}
+        model[item[:name]] = { "@odata.type" => "#{@service[:namespace]}.#{item[:dataType]}" }
       end
 
       if item[:isKey]
@@ -453,7 +453,7 @@ module SpecMaker
   end
 
   def self.sanitize_file_name(fileName)
-    return fileName.gsub('_', '-')
+    return fileName.tr('_', '-')
   end
 
   # module end
