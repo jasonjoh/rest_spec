@@ -194,7 +194,7 @@ module SpecMaker
       # identify the HTTP method
       # Per https://msdn.microsoft.com/en-us/library/hh537061.aspx
       # Functions are GET, not POST
-      http_method = method && method[:isFunction] ? 'GET' : 'POST'
+      http_method = method && method[:isFunction] ? 'GET ' : 'POST '
 
       # identify the functional path
       if method && method[:isFunction] && !method[:parameters].empty?
