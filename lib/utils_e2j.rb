@@ -80,10 +80,10 @@ module SpecMaker
   @iexampleFilesWrittem = 0
   @annotations = {}
 
-  def self.camelcase (str="")
+  def self.camelcase(str = "")
     if str.length > 0
       str
-      #str[0, 1].downcase + str[1..-1]
+      # str[0, 1].downcase + str[1..-1]
     else
       str
     end
@@ -102,7 +102,7 @@ module SpecMaker
   end
 
   def self.parse_annotation(target, term, annotation)
-    #puts "-> Processing Annotation; Target: #{target}; Term: #{term}; Annotation: #{annotation}"
+    # puts "-> Processing Annotation; Target: #{target}; Term: #{term}; Annotation: #{annotation}"
 
     if annotation[:Term]
       term = get_type(annotation[:Term]).downcase
@@ -123,15 +123,15 @@ module SpecMaker
     elsif annotation[:String]
       @annotations[target][term] = annotation[:String]
     elsif annotation[:Record]
-    if annotation[:Record][:PropertyValue]
-      if annotation[:Record][:PropertyValue].is_a?(Array)
-        annotation[:Record][:PropertyValue].each do |propertyValue|
-          parse_annotation(target, term, propertyValue)
+      if annotation[:Record][:PropertyValue]
+        if annotation[:Record][:PropertyValue].is_a?(Array)
+          annotation[:Record][:PropertyValue].each do |propertyValue|
+            parse_annotation(target, term, propertyValue)
+          end
+        else
+          parse_annotation(target, term, annotation[:Record][:PropertyValue])
         end
-      else
-        parse_annotation(target, term, annotation[:Record][:PropertyValue])
       end
-    end
     elsif annotation[:Collection]
       # TODO
     end
@@ -139,7 +139,7 @@ module SpecMaker
 
   def self.set_description(target, itemToSet)
     target = target.downcase
-    #puts "-> Getting Annotation; Target: #{target}"
+    # puts "-> Getting Annotation; Target: #{target}"
     if @annotations[target]
       if @annotations[target]["description"]
         itemToSet[:description] = @annotations[target]["description"]
@@ -151,7 +151,7 @@ module SpecMaker
   # Create object_method-name.md file in lowercase.
   #
   #
-  def self.create_examplefile(objectName=nil, methodName=nil)
+  def self.create_examplefile(objectName = nil, methodName = nil)
     File.open(JSON_EXAMPLE_FOLDER + (objectName + '_' + methodName).downcase + ".md", "w") do |f|
       f.write('##### Example', :encoding => 'UTF-8')
       @iexampleFilesWrittem = @iexampleFilesWrittem + 1
@@ -162,7 +162,7 @@ module SpecMaker
   # Create example files for object/collection.
   #
   #
-  def self.create_auto_examplefiles(objectName=nil, isCollection)
+  def self.create_auto_examplefiles(objectName = nil, isCollection)
     if !isCollection
       create_examplefile(objectName, 'auto_get')
       create_examplefile(objectName, 'auto_post')
@@ -178,7 +178,7 @@ module SpecMaker
   # Create example files from array that contains many methods (1 per method)
   #
   #
-  def self.create_basetype_examplefiles(methods=[], objectName=nil)
+  def self.create_basetype_examplefiles(methods = [], objectName = nil)
     methods.each do |item|
       create_examplefile(objectName, item[:name])
     end
@@ -197,7 +197,7 @@ module SpecMaker
   #	from an existing JSON file from previous run.
   #
   #
-  def self.preserve_method_descriptions (objectName=nil, method=nil)
+  def self.preserve_method_descriptions(objectName = nil, method = nil)
     fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
     if File.file?(fullpath)
       prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
@@ -207,20 +207,20 @@ module SpecMaker
           method[:description] = item[:description] if !item[:description].empty?
           method[:displayName] = item[:displayName] if item[:displayName] && !item[:displayName].empty?
           method[:prerequisites] = item[:prerequisites] if !item[:prerequisites].empty?
-           method[:parameters].each do |param|
+          method[:parameters].each do |param|
             item[:parameters].each do |paramOld|
               if paramOld[:name] == param[:name]
                 param[:description] = paramOld[:description] if !paramOld[:description].empty?
               end
             end
-           end
+          end
         end
       end
     end
     return method
   end
 
-  def self.preserve_object_property_descriptions(objectName=nil)
+  def self.preserve_object_property_descriptions(objectName = nil)
     fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
     if File.file?(fullpath)
       prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
@@ -242,11 +242,11 @@ module SpecMaker
   # Extract only the type name. Example: Collection(Microsoft.Graph.Recipient) to Recipient
   # and Microsoft.Graph.Recipient to Recipient
   #
-  def self.get_type(t=nil)
+  def self.get_type(t = nil)
     return camelcase t[(t.rindex('.') + 1)..-1].chomp(')')
   end
 
-  def self.merge_members(current=nil, base=nil)
+  def self.merge_members(current = nil, base = nil)
     # if objectName != nil
     # 	if base.is_a?(Hash)
     # 		dt = get_type(base[:Type])
@@ -284,9 +284,9 @@ module SpecMaker
     end
   end
 
-  def self.process_property (className, item=nil)
+  def self.process_property(className, item = nil)
     prop = deep_copy(@struct[:property])
-      prop[:name] = camelcase item[:Name]
+    prop[:name] = camelcase item[:Name]
     dt = get_type(item[:Type])
     prop[:isCollection] = true if item[:Type].start_with?('Collection(')
     prop[:dataType] = dt
@@ -312,7 +312,7 @@ module SpecMaker
     return prop
   end
 
-  def self.process_navigation (className, item=nil)
+  def self.process_navigation(className, item = nil)
     prop = deep_copy(@struct[:property])
     prop[:name] = camelcase item[:Name]
     prop[:isRelationship] = true
@@ -336,7 +336,7 @@ module SpecMaker
     return prop
   end
 
-  def self.process_complextype (className, item=nil)
+  def self.process_complextype(className, item = nil)
     prop = deep_copy(@struct[:property])
     prop[:name] = camelcase item[:Name]
     dt = get_type(item[:Type])
@@ -357,11 +357,11 @@ module SpecMaker
     parse_annotations(annotationTarget, item[:Annotation])
     set_description(annotationTarget, prop)
 
-  return prop
+    return prop
   end
 
   # Process methods
-  def self.process_method (item=nil, type=nil)
+  def self.process_method(item = nil, type = nil)
     mtd = deep_copy(@struct[:method])
     mtd[:name] = camelcase item[:Name].chomp(')')
     if type == 'function'
@@ -417,17 +417,17 @@ module SpecMaker
       @methods[entity_name.downcase.to_sym] = []
       @methods[entity_name.downcase.to_sym].push mtd
     end
-    #create_examplefile(entity_name, mtd[:name])
+    # create_examplefile(entity_name, mtd[:name])
     return
   end
 
-  def self.fill_rest_path (parentPath=nil, entity=nil, isParentCollection=true)
+  def self.fill_rest_path(parentPath = nil, entity = nil, isParentCollection = true)
     jsonCache = Hash.new
     fill_rest_path_internal(parentPath, entity, isParentCollection, jsonCache)
     write_json_from_cache(jsonCache)
   end
 
-  def self.read_json_from_cache (jsonCache=nil, fullpath=nil)
+  def self.read_json_from_cache(jsonCache = nil, fullpath = nil)
     value = jsonCache[fullpath]
 
     if value.nil?
@@ -438,15 +438,15 @@ module SpecMaker
     return value;
   end
 
-  def self.write_json_from_cache (jsonCache=nil)
-    jsonCache.each_pair do |fullpath,object|
+  def self.write_json_from_cache(jsonCache = nil)
+    jsonCache.each_pair do |fullpath, object|
       File.open(fullpath, "w") do |f|
         f.write(JSON.pretty_generate object, :encoding => 'UTF-8')
       end
     end
   end
 
-  def self.fill_rest_path_internal (parentPath=nil, entity=nil, isParentCollection=true, jsonCache=nil)
+  def self.fill_rest_path_internal(parentPath = nil, entity = nil, isParentCollection = true, jsonCache = nil)
     fullpath = JSON_SOURCE_FOLDER + '/' + entity.downcase + '.json'
     ids = ''
 

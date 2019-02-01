@@ -58,7 +58,6 @@ Layout/ExtraSpacing:
 Layout/IndentationConsistency:
   Exclude:
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 5
 # Cop supports --auto-correct.
@@ -66,28 +65,24 @@ Layout/IndentationConsistency:
 Layout/IndentationWidth:
   Exclude:
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 20
 # Cop supports --auto-correct.
 Layout/LeadingCommentSpace:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 4
 # Cop supports --auto-correct.
 Layout/SpaceAfterComma:
   Exclude:
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 21
 # Cop supports --auto-correct.
 Layout/SpaceAfterMethodName:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 56
 # Cop supports --auto-correct.
@@ -97,7 +92,6 @@ Layout/SpaceAroundEqualsInParameterDefault:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 11
 # Cop supports --auto-correct.
