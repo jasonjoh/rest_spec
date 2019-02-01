@@ -35,7 +35,7 @@ module SpecMaker
 
   # Load the structure
   JSON_STRUCTURE = "../jsonFiles/template/restresource_structures.json"
-  @struct = JSON.parse(File.read(JSON_STRUCTURE, :encoding => 'UTF-8'), {:symbolize_names => true})
+  @struct = JSON.parse(File.read(JSON_STRUCTURE, :encoding => 'UTF-8'), :symbolize_names => true)
   @template = @struct[:object]
   @service = @struct[:serviceSettings]
 
@@ -115,11 +115,7 @@ module SpecMaker
     end
 
     if annotation[:Bool]
-      if annotation[:Bool].downcase == 'true'
-        @annotations[target][term] = true
-      else
-        @annotations[target][term] = false
-      end
+      @annotations[target][term] = annotation[:Bool].casecmp('true').zero?
     elsif annotation[:String]
       @annotations[target][term] = annotation[:String]
     elsif annotation[:Record]
@@ -194,13 +190,13 @@ module SpecMaker
 
   ###
   # Copy method description, display name, parameter descriptions, etc.
-  #	from an existing JSON file from previous run.
+  #  from an existing JSON file from previous run.
   #
   #
   def self.preserve_method_descriptions(objectName = nil, method = nil)
     fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
     if File.file?(fullpath)
-      prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
+      prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
       prevMethods = prevObject[:methods]
       prevMethods.each do |item|
         if item[:name] == method[:name]
@@ -223,7 +219,7 @@ module SpecMaker
   def self.preserve_object_property_descriptions(objectName = nil)
     fullpath = JSON_PREV_SOURCE_FOLDER + objectName.downcase + '.json'
     if File.file?(fullpath)
-      prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), {:symbolize_names => true})
+      prevObject = JSON.parse(File.read(fullpath, :encoding => 'UTF-8'), :symbolize_names => true)
       @json_object[:description] = prevObject[:description]
       prevProperties = prevObject[:properties]
       prevProperties.each do |item|
@@ -234,7 +230,7 @@ module SpecMaker
         end
       end
       # else
-      # 	puts "-----> No previous JSON file version exists for this resource."
+      #   puts "-----> No previous JSON file version exists for this resource."
     end
   end
 
@@ -248,15 +244,15 @@ module SpecMaker
 
   def self.merge_members(current = nil, base = nil)
     # if objectName != nil
-    # 	if base.is_a?(Hash)
-    # 		dt = get_type(base[:Type])
-    # 		return current if dt.downcase == objectName.downcase
-    # 	elsif base.is_a?(Array)
-    # 		base.each_with_index do |item, i|
-    # 			dt = get_type(item[:Type])
-    # 				base.delete_at(i) if dt == objectName
-    # 		end
-    # 	end
+    #   if base.is_a?(Hash)
+    #     dt = get_type(base[:Type])
+    #     return current if dt.downcase == objectName.downcase
+    #   elsif base.is_a?(Array)
+    #     base.each_with_index do |item, i|
+    #       dt = get_type(item[:Type])
+    #         base.delete_at(i) if dt == objectName
+    #     end
+    #   end
     # end
 
     arr = []
@@ -364,11 +360,7 @@ module SpecMaker
   def self.process_method(item = nil, type = nil)
     mtd = deep_copy(@struct[:method])
     mtd[:name] = camelcase item[:Name].chomp(')')
-    if type == 'function'
-      mtd[:isFunction] = true
-    else
-      mtd[:isFunction] = false
-    end
+    mtd[:isFunction] = type == 'function'
     mtd[:httpSuccessCode] = '200'
     if item.has_key?(:ReturnType)
       dt = get_type(item[:ReturnType][:Type])
@@ -422,7 +414,7 @@ module SpecMaker
   end
 
   def self.fill_rest_path(parentPath = nil, entity = nil, isParentCollection = true)
-    jsonCache = Hash.new
+    jsonCache = {}
     fill_rest_path_internal(parentPath, entity, isParentCollection, jsonCache)
     write_json_from_cache(jsonCache)
   end
@@ -470,11 +462,11 @@ module SpecMaker
         end
       end
       # construct the path and
-      if isParentCollection
-        k = "#{parentPath}/{#{ids.chomp('|')}}".chomp('/{}')
-      else
-        k = parentPath
-      end
+      k = if isParentCollection
+            "#{parentPath}/{#{ids.chomp('|')}}".chomp('/{}')
+          else
+            parentPath
+          end
       object["restPath"][k] = true
       return if object["properties"].length == 0
 
