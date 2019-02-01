@@ -230,7 +230,6 @@ Style/MutableConstant:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 9
 # Cop supports --auto-correct.
@@ -284,15 +283,6 @@ Style/StringLiterals:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: single_quotes, double_quotes
-Style/StringLiteralsInInterpolation:
-  Exclude:
-    - 'utils_e2j.rb'
 
 # Offense count: 4
 # Cop supports --auto-correct.
@@ -306,4 +296,3 @@ Style/ZeroLengthPredicate:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'

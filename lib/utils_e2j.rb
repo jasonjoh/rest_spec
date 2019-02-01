@@ -5,17 +5,17 @@ require 'logger'
 # require 'FileUtils'
 
 module SpecMaker
-  JSON_BASE_FOLDER = "../jsonFiles/#{$options[:version]}/"
+  JSON_BASE_FOLDER = "../jsonFiles/#{$options[:version]}/".freeze
   JSON_SOURCE_FOLDER = JSON_BASE_FOLDER + 'rest/'
   JSON_SETTINGS_FOLDER = JSON_BASE_FOLDER + 'settings/'
   JSON_PREV_SOURCE_FOLDER = JSON_BASE_FOLDER + 'rest_previous/'
   ENUMS = JSON_SETTINGS_FOLDER + 'restenums.json'
   ACTIONS = JSON_BASE_FOLDER + 'actions.json'
   ANNOTATIONS = JSON_SETTINGS_FOLDER + 'annotations.json'
-  CSDL_LOCATION = "../data/#{$options[:version]}/"
+  CSDL_LOCATION = "../data/#{$options[:version]}/".freeze
 
   JSON_EXAMPLE_FOLDER = JSON_BASE_FOLDER + 'examples/'
-  BASETYPES = %w[Entity directoryObject Attachment Message OutlookItem Extension]
+  BASETYPES = %w[Entity directoryObject Attachment Message OutlookItem Extension].freeze
   BASETYPES_ALLCASE = BASETYPES.concat BASETYPES.map(&:downcase)
 
   ####
@@ -26,15 +26,15 @@ module SpecMaker
   #
   ##
   BASETYPE_MAPPING = {
-    "Extension" => "extension",
-    "extension" => "extension"
-  }
+    'Extension' => 'extension',
+    'extension' => 'extension'
+  }.freeze
   # Load the template
   # JSON_TEMPLATE = "../jsonFiles/template/restresourcetemplate.json"
   # @template = JSON.parse(File.read(JSON_TEMPLATE, :encoding => 'UTF-8'), {:symbolize_names => true})
 
   # Load the structure
-  JSON_STRUCTURE = "../jsonFiles/template/restresource_structures.json"
+  JSON_STRUCTURE = '../jsonFiles/template/restresource_structures.json'.freeze
   @struct = JSON.parse(File.read(JSON_STRUCTURE, encoding: 'UTF-8'), symbolize_names: true)
   @template = @struct[:object]
   @service = @struct[:serviceSettings]
@@ -47,10 +47,10 @@ module SpecMaker
   Dir.mkdir(JSON_SETTINGS_FOLDER) unless File.exist?(JSON_SETTINGS_FOLDER)
 
   # Log file
-  LOG_FOLDER = '../logs'
+  LOG_FOLDER = '../logs'.freeze
   Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
-  LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt"
+  LOG_FILE = File.basename($PROGRAM_NAME, '.rb') + '.txt'
   File.delete("#{LOG_FOLDER}/#{LOG_FILE}") if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger.level = Logger::DEBUG
@@ -78,8 +78,8 @@ module SpecMaker
   @iexampleFilesWrittem = 0
   @annotations = {}
 
-  def self.camelcase(str = "")
-    if str.length > 0
+  def self.camelcase(str = '')
+    if !str.empty?
       str
       # str[0, 1].downcase + str[1..-1]
     else
@@ -105,7 +105,7 @@ module SpecMaker
     if annotation[:Term]
       term = get_type(annotation[:Term]).downcase
     elsif annotation[:Property]
-      term = term + "/" + annotation[:Property].downcase
+      term = term + '/' + annotation[:Property].downcase
     end
 
     @annotations[target] = {} unless @annotations[target]
@@ -133,7 +133,7 @@ module SpecMaker
     target = target.downcase
     # puts "-> Getting Annotation; Target: #{target}"
     if @annotations[target]
-      itemToSet[:description] = @annotations[target]["description"] if @annotations[target]["description"]
+      itemToSet[:description] = @annotations[target]['description'] if @annotations[target]['description']
     end
   end
 
@@ -142,7 +142,7 @@ module SpecMaker
   #
   #
   def self.create_examplefile(objectName = nil, methodName = nil)
-    File.open(JSON_EXAMPLE_FOLDER + (objectName + '_' + methodName).downcase + ".md", "w") do |f|
+    File.open(JSON_EXAMPLE_FOLDER + (objectName + '_' + methodName).downcase + '.md', 'w') do |f|
       f.write('##### Example', encoding: 'UTF-8')
       @iexampleFilesWrittem += 1
     end
@@ -280,7 +280,7 @@ module SpecMaker
     prop[:dataType] = dt
     if @enum_objects.key?(dt.to_sym)
       prop[:enumName] = dt
-      prop[:dataType] = "string"
+      prop[:dataType] = 'string'
     end
     if @key_save.include?(item[:Name])
       prop[:isKey] = true
@@ -290,7 +290,7 @@ module SpecMaker
     prop[:isUnicode] = false if item[:Unicode] == 'false'
     @iprop += 1
 
-    annotationTarget = className + "/" + item[:Name]
+    annotationTarget = className + '/' + item[:Name]
     parse_annotations(annotationTarget, item[:Annotation])
     set_description(annotationTarget, prop)
 
@@ -310,7 +310,7 @@ module SpecMaker
     prop[:isUnicode] = false if item[:Unicode] == 'false'
     @inprop += 1
 
-    annotationTarget = className + "/" + item[:Name]
+    annotationTarget = className + '/' + item[:Name]
     parse_annotations(annotationTarget, item[:Annotation])
     set_description(annotationTarget, prop)
 
@@ -325,12 +325,12 @@ module SpecMaker
     prop[:dataType] = dt
     if @enum_objects.key?(dt.to_sym)
       prop[:enumName] = dt
-      prop[:dataType] = "String"
+      prop[:dataType] = 'String'
     end
     prop[:isNullable] = false if item[:Nullable] == 'false'
     prop[:isUnicode] = false if item[:Unicode] == 'false'
 
-    annotationTarget = className + "/" + item[:Name]
+    annotationTarget = className + '/' + item[:Name]
     parse_annotations(annotationTarget, item[:Annotation])
     set_description(annotationTarget, prop)
 
@@ -409,7 +409,7 @@ module SpecMaker
 
   def self.write_json_from_cache(jsonCache = nil)
     jsonCache.each_pair do |fullpath, object|
-      File.open(fullpath, "w") do |f|
+      File.open(fullpath, 'w') do |f|
         f.write(JSON.pretty_generate(object, encoding: 'UTF-8'))
       end
     end
@@ -426,13 +426,13 @@ module SpecMaker
       # Check if the path already exists. This logic will eliminate deep redundant paths.
       # May lose some important ones.. but if this check is removed, some really deep/complex
       # logic needs to be inserted to add the
-      object["restPath"].keys.each do |k|
+      object['restPath'].keys.each do |k|
         return if parentPath.downcase.include?(k.to_s.downcase)
       end
 
       # Construct path and remove empty | and <> at the end (account for no key being available on the object.)
-      object["properties"].each do |item|
-        ids = ids + item["name"] + '|' if item["isKey"]
+      object['properties'].each do |item|
+        ids = ids + item['name'] + '|' if item['isKey']
       end
       # construct the path and
       k = if isParentCollection
@@ -440,11 +440,11 @@ module SpecMaker
           else
             parentPath
           end
-      object["restPath"][k] = true
-      return if object["properties"].empty?
+      object['restPath'][k] = true
+      return if object['properties'].empty?
 
-      object["properties"].each do |item|
-        fill_rest_path_internal("#{k}/#{item["name"]}", item["dataType"], item["isCollection"], jsonCache) if item["isRelationship"]
+      object['properties'].each do |item|
+        fill_rest_path_internal("#{k}/#{item['name']}", item['dataType'], item['isCollection'], jsonCache) if item['isRelationship']
       end
       return
     else
