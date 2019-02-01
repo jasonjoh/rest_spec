@@ -42,13 +42,11 @@ module SpecMaker
   Dir.mkdir(JSON_BASE_FOLDER) unless File.exist?(JSON_BASE_FOLDER)
   Dir.mkdir(CSDL_LOCATION) unless File.exist?(CSDL_LOCATION)
 
-#
   Dir.mkdir(JSON_SOURCE_FOLDER) unless File.exist?(JSON_SOURCE_FOLDER)
   FileUtils.rm Dir.glob(JSON_SOURCE_FOLDER + '/*')
   Dir.mkdir(JSON_SETTINGS_FOLDER) unless File.exist?(JSON_SETTINGS_FOLDER)
-#
 
-# Log file
+  # Log file
   LOG_FOLDER = '../logs'
   Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
@@ -58,7 +56,7 @@ module SpecMaker
   end
   @logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger.level = Logger::DEBUG
-# End log file
+  # End log file
 
   @iprop = 0
   @ienums = 0
@@ -215,7 +213,7 @@ module SpecMaker
                 param[:description] = paramOld[:description] if !paramOld[:description].empty?
               end
             end
-          end
+           end
         end
       end
     end
@@ -235,8 +233,8 @@ module SpecMaker
           end
         end
       end
-    # else
-    # 	puts "-----> No previous JSON file version exists for this resource."
+      # else
+      # 	puts "-----> No previous JSON file version exists for this resource."
     end
   end
 
@@ -249,7 +247,6 @@ module SpecMaker
   end
 
   def self.merge_members(current=nil, base=nil)
-
     # if objectName != nil
     # 	if base.is_a?(Hash)
     # 		dt = get_type(base[:Type])
@@ -385,6 +382,7 @@ module SpecMaker
       item[:Parameter].each_with_index do |p, i|
         parm = deep_copy(@struct[:parameter])
         next if i == 0
+
         @iparam = @iparam + 1
         parm[:name] = camelcase p[:Name]
 
@@ -449,7 +447,6 @@ module SpecMaker
   end
 
   def self.fill_rest_path_internal (parentPath=nil, entity=nil, isParentCollection=true, jsonCache=nil)
-
     fullpath = JSON_SOURCE_FOLDER + '/' + entity.downcase + '.json'
     ids = ''
 
@@ -480,6 +477,7 @@ module SpecMaker
       end
       object["restPath"][k] = true
       return if object["properties"].length == 0
+
       object["properties"].each do |item|
         if item["isRelationship"]
           fill_rest_path_internal("#{k}/#{item["name"]}", item["dataType"], item["isCollection"], jsonCache)
@@ -489,7 +487,5 @@ module SpecMaker
     else
       return
     end
-
   end
-
 end

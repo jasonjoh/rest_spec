@@ -6,33 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleAlignWith.
-# SupportedStylesAlignWith: either, start_of_block, start_of_line
-Layout/BlockAlignment:
-  Exclude:
-    - 'utils_e2j.rb'
-
-# Offense count: 10
-# Cop supports --auto-correct.
-Layout/CommentIndentation:
-  Exclude:
-    - 'utils_e2j.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: AllowBorderComment, AllowMarginComment.
-Layout/EmptyComment:
-  Exclude:
-    - 'utils_e2j.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Layout/EmptyLineAfterGuardClause:
-  Exclude:
-    - 'utils_e2j.rb'
-
 # Offense count: 8
 # Cop supports --auto-correct.
 Layout/EmptyLines:
@@ -53,7 +26,6 @@ Layout/EmptyLinesAroundBlockBody:
 Layout/EmptyLinesAroundMethodBody:
   Exclude:
     - 'diff_two_versions.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 5
 # Cop supports --auto-correct.
@@ -63,7 +35,6 @@ Layout/EmptyLinesAroundModuleBody:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 4
 # Configuration parameters: EnforcedStyle.
@@ -72,7 +43,6 @@ Layout/EndOfLine:
   Exclude:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
-    - 'utils_e2j.rb'
 
 # Offense count: 6
 # Cop supports --auto-correct.
