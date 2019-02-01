@@ -50,7 +50,7 @@ module SpecMaker
   LOG_FOLDER = '../logs'
   Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
-  LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt";
+  LOG_FILE = File.basename($PROGRAM_NAME, ".rb") + ".txt"
   File.delete("#{LOG_FOLDER}/#{LOG_FILE}") if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger.level = Logger::DEBUG
@@ -144,7 +144,7 @@ module SpecMaker
   def self.create_examplefile(objectName = nil, methodName = nil)
     File.open(JSON_EXAMPLE_FOLDER + (objectName + '_' + methodName).downcase + ".md", "w") do |f|
       f.write('##### Example', encoding: 'UTF-8')
-      @iexampleFilesWrittem = @iexampleFilesWrittem + 1
+      @iexampleFilesWrittem += 1
     end
   end
 
@@ -193,21 +193,21 @@ module SpecMaker
       prevObject = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
       prevMethods = prevObject[:methods]
       prevMethods.each do |item|
-        if item[:name] == method[:name]
-          method[:description] = item[:description] unless item[:description].empty?
-          method[:displayName] = item[:displayName] if item[:displayName] && !item[:displayName].empty?
-          method[:prerequisites] = item[:prerequisites] unless item[:prerequisites].empty?
-          method[:parameters].each do |param|
-            item[:parameters].each do |paramOld|
-              if paramOld[:name] == param[:name]
-                param[:description] = paramOld[:description] unless paramOld[:description].empty?
-              end
+        next unless item[:name] == method[:name]
+
+        method[:description] = item[:description] unless item[:description].empty?
+        method[:displayName] = item[:displayName] if item[:displayName] && !item[:displayName].empty?
+        method[:prerequisites] = item[:prerequisites] unless item[:prerequisites].empty?
+        method[:parameters].each do |param|
+          item[:parameters].each do |paramOld|
+            if paramOld[:name] == param[:name]
+              param[:description] = paramOld[:description] unless paramOld[:description].empty?
             end
           end
         end
       end
     end
-    return method
+    method
   end
 
   def self.preserve_object_property_descriptions(objectName = nil)
@@ -231,7 +231,7 @@ module SpecMaker
   # and Microsoft.Graph.Recipient to Recipient
   #
   def self.get_type(t = nil)
-    return camelcase t[(t.rindex('.') + 1)..-1].chomp(')')
+    camelcase t[(t.rindex('.') + 1)..-1].chomp(')')
   end
 
   def self.merge_members(current = nil, base = nil)
@@ -278,20 +278,23 @@ module SpecMaker
     dt = get_type(item[:Type])
     prop[:isCollection] = true if item[:Type].start_with?('Collection(')
     prop[:dataType] = dt
-    if @enum_objects.has_key?(dt.to_sym)
+    if @enum_objects.key?(dt.to_sym)
       prop[:enumName] = dt
       prop[:dataType] = "string"
     end
-    prop[:isKey], prop[:isReadOnly] = true, true if @key_save.include?(item[:Name])
+    if @key_save.include?(item[:Name])
+      prop[:isKey] = true
+      prop[:isReadOnly] = true
+    end
     prop[:isNullable] = false if item[:Nullable] == 'false'
     prop[:isUnicode] = false if item[:Unicode] == 'false'
-    @iprop = @iprop + 1
+    @iprop += 1
 
     annotationTarget = className + "/" + item[:Name]
     parse_annotations(annotationTarget, item[:Annotation])
     set_description(annotationTarget, prop)
 
-    return prop
+    prop
   end
 
   def self.process_navigation(className, item = nil)
@@ -305,13 +308,13 @@ module SpecMaker
     prop[:isReadOnly] = true
     prop[:isNullable] = false if item[:Nullable] == 'false'
     prop[:isUnicode] = false if item[:Unicode] == 'false'
-    @inprop = @inprop + 1
+    @inprop += 1
 
     annotationTarget = className + "/" + item[:Name]
     parse_annotations(annotationTarget, item[:Annotation])
     set_description(annotationTarget, prop)
 
-    return prop
+    prop
   end
 
   def self.process_complextype(className, item = nil)
@@ -320,7 +323,7 @@ module SpecMaker
     dt = get_type(item[:Type])
     prop[:isCollection] = true if item[:Type].start_with?('Collection(')
     prop[:dataType] = dt
-    if @enum_objects.has_key?(dt.to_sym)
+    if @enum_objects.key?(dt.to_sym)
       prop[:enumName] = dt
       prop[:dataType] = "String"
     end
@@ -331,7 +334,7 @@ module SpecMaker
     parse_annotations(annotationTarget, item[:Annotation])
     set_description(annotationTarget, prop)
 
-    return prop
+    prop
   end
 
   # Process methods
@@ -340,7 +343,7 @@ module SpecMaker
     mtd[:name] = camelcase item[:Name].chomp(')')
     mtd[:isFunction] = type == 'function'
     mtd[:httpSuccessCode] = '200'
-    if item.has_key?(:ReturnType)
+    if item.key?(:ReturnType)
       dt = get_type(item[:ReturnType][:Type])
       mtd[:isReturnTypeCollection] = true if item[:ReturnType][:Type].start_with?('Collection(')
       mtd[:returnType] = dt
@@ -351,9 +354,9 @@ module SpecMaker
       mtd[:parameters] = []
       item[:Parameter].each_with_index do |p, i|
         parm = deep_copy(@struct[:parameter])
-        next if i == 0
+        next if i.zero?
 
-        @iparam = @iparam + 1
+        @iparam += 1
         parm[:name] = camelcase p[:Name]
 
         dtp = get_type(p[:Type])
@@ -377,14 +380,14 @@ module SpecMaker
     entity_name = entity_name.chomp(')')
 
     mtd = preserve_method_descriptions(entity_name, mtd)
-    if @methods.has_key?(entity_name.downcase.to_sym)
+    if @methods.key?(entity_name.downcase.to_sym)
       @methods[entity_name.downcase.to_sym].push mtd
     else
       @methods[entity_name.downcase.to_sym] = []
       @methods[entity_name.downcase.to_sym].push mtd
     end
     # create_examplefile(entity_name, mtd[:name])
-    return
+    nil
   end
 
   def self.fill_rest_path(parentPath = nil, entity = nil, isParentCollection = true)
@@ -401,13 +404,13 @@ module SpecMaker
       jsonCache[fullpath] = value
     end
 
-    return value;
+    value
   end
 
   def self.write_json_from_cache(jsonCache = nil)
     jsonCache.each_pair do |fullpath, object|
       File.open(fullpath, "w") do |f|
-        f.write(JSON.pretty_generate object, encoding: 'UTF-8')
+        f.write(JSON.pretty_generate(object, encoding: 'UTF-8'))
       end
     end
   end
@@ -438,7 +441,7 @@ module SpecMaker
             parentPath
           end
       object["restPath"][k] = true
-      return if object["properties"].length == 0
+      return if object["properties"].empty?
 
       object["properties"].each do |item|
         fill_rest_path_internal("#{k}/#{item["name"]}", item["dataType"], item["isCollection"], jsonCache) if item["isRelationship"]
