@@ -350,7 +350,6 @@ Style/NegatedIf:
     - 'diff_two_versions.rb'
     - 'edmx2json.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 9
 # Cop supports --auto-correct.
@@ -370,14 +369,6 @@ Style/Next:
   Exclude:
     - 'utils_e2j.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: predicate, comparison
-Style/NilComparison:
-  Exclude:
-    - 'utils_j2m.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, EnforcedStyle, IgnoredMethods.
@@ -394,20 +385,6 @@ Style/ParallelAssignment:
     - 'diff_two_versions.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AllowSafeAssignment, AllowInMultilineConditions.
-Style/ParenthesesAroundCondition:
-  Exclude:
-    - 'utils_j2m.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: PreferredDelimiters.
-Style/PercentLiteralDelimiters:
-  Exclude:
-    - 'utils_j2m.rb'
 
 # Offense count: 9
 # Cop supports --auto-correct.
@@ -430,15 +407,6 @@ Style/RedundantParentheses:
 Style/RedundantReturn:
   Exclude:
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: implicit, explicit
-Style/RescueStandardError:
-  Exclude:
-    - 'utils_j2m.rb'
 
 # Offense count: 34
 # Cop supports --auto-correct.
@@ -448,7 +416,6 @@ Style/SelfAssignment:
     - 'edmx2json.rb'
     - 'report_delta_edits.rb'
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 3
 # Cop supports --auto-correct.
@@ -456,7 +423,6 @@ Style/SelfAssignment:
 Style/Semicolon:
   Exclude:
     - 'utils_e2j.rb'
-    - 'utils_j2m.rb'
 
 # Offense count: 172
 # Cop supports --auto-correct.

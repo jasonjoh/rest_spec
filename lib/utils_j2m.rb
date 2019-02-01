@@ -123,7 +123,7 @@ module SpecMaker
   LOG_FOLDER = '../logs'.freeze
   Dir.mkdir(LOG_FOLDER) unless File.exist?(LOG_FOLDER)
 
-  LOG_FILE = File.basename($PROGRAM_NAME, '.rb') + '.txt';
+  LOG_FILE = File.basename($PROGRAM_NAME, '.rb') + '.txt'
   File.delete("#{LOG_FOLDER}/#{LOG_FILE}") if File.exist?("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger = Logger.new("#{LOG_FOLDER}/#{LOG_FILE}")
   @logger.level = Logger::DEBUG
@@ -156,12 +156,12 @@ module SpecMaker
   # Create markdown folder if it doesn't already exist
   Dir.mkdir(MARKDOWN_RESOURCE_FOLDER) unless File.exist?(MARKDOWN_RESOURCE_FOLDER)
 
-  if !File.exist?(JSON_SOURCE_FOLDER)
+  unless File.exist?(JSON_SOURCE_FOLDER)
     @logger.fatal('JSON Resource File folder does not exist. Aborting')
     abort("*** FATAL ERROR *** Input JSON resource folder: #{JSON_SOURCE_FOLDER} doesn't exist. Correct and re-run.")
   end
 
-  @logger.warn('API examples folder does not exist') if !File.exist?(EXAMPLES_FOLDER)
+  @logger.warn('API examples folder does not exist') unless File.exist?(EXAMPLES_FOLDER)
 
   ##
   # Load up all the known existing annotations.
@@ -170,7 +170,7 @@ module SpecMaker
 
   begin
     @annotations = JSON.parse File.read(ANNOTATIONS, encoding: 'UTF-8')
-  rescue
+  rescue StandardError
     @logger.warn("JSON Annotations input file doesn't exist: #{@current_object}")
   end
 
@@ -181,7 +181,7 @@ module SpecMaker
 
   begin
     @enumHash = JSON.parse File.read(ENUMS, encoding: 'UTF-8')
-  rescue
+  rescue StandardError
     @logger.warn("JSON Enumeration input file doesn't exist: #{@current_object}")
   end
 
@@ -197,7 +197,7 @@ module SpecMaker
   end
 
   def self.uuid_date
-    return UUID_DATE
+    UUID_DATE
   end
 
   def self.get_create_description(objectName = nil, use_name = nil)
@@ -208,7 +208,7 @@ module SpecMaker
       createDescription = object[:createDescription]
     end
     createDescription = "Use this API to create a new #{use_name || objectName}." if createDescription.empty?
-    return createDescription
+    createDescription
   end
 
   def self.assign_value(dataType = nil, name = '')
@@ -256,7 +256,7 @@ module SpecMaker
       end
     end
 
-    return model
+    model
   end
 
   def self.assign_value2(dataType = nil, name = '', isRel = false)
@@ -301,7 +301,7 @@ module SpecMaker
         next if item[:isRelationship]
         next if i > 5
 
-        if !includeKey
+        unless includeKey
           next if item[:isKey]
         end
 
@@ -315,7 +315,7 @@ module SpecMaker
     end
     model = { 'value' => [model] } if collFlag
     model = { objectName.to_s => model } if isOpenType && openTypeReq
-    return JSON.pretty_generate model, max_nesting: false
+    JSON.pretty_generate model, max_nesting: false
   end
 
   def self.get_json_model_params(params = [])
@@ -326,7 +326,7 @@ module SpecMaker
       model[item[:name]] = [model[item[:name]]] if item[:isCollection]
     end
 
-    return JSON.pretty_generate model, max_nesting: false
+    JSON.pretty_generate model, max_nesting: false
   end
 
   def self.get_json_model(properties = [])
@@ -352,7 +352,7 @@ module SpecMaker
       model[item[:name]] = model[item[:name]] + ' (etag)' if %w[eTag cTag etag ctag].include?(item[:name])
       model[item[:name]] = [model[item[:name]]] if item[:isCollection]
     end
-    return JSON.pretty_generate model
+    JSON.pretty_generate model
   end
 
   def self.get_json_model_pretext(objectName = '', properties = [], baseType = '')
@@ -366,49 +366,49 @@ module SpecMaker
 
       model['keyProperty'] = item[:name] if item[:isKey]
     end
-    return '<!-- ' + (JSON.pretty_generate model) + '-->'
+    '<!-- ' + (JSON.pretty_generate model) + '-->'
   end
 
   def self.pretty_json(input = nil)
     output = ''
     save = ''
     input.split("\n").each do |line|
-      if (line[0..0] == '{')
-        output = output + line
+      if line[0..0] == '{'
+        output += line
         next
       end
-      if (line[0..0] == '}')
+      if line[0..0] == '}'
         output = output + save + NEWLINE
         save = '' # not required...
-        output = output + line
+        output += line
         next
       end
       if line[2..2] == '"'
         output = output + save + NEWLINE
-        output = output + line
+        output += line
         save = ''
         next
       end
-      save = save + line.strip
+      save += line.strip
     end
-    return output
+    output
   end
 
   def self.get_json_page_annotation(description = nil)
     model = deep_copy(@mdpageannotate)
     model[:description] = description
-    return '<!-- ' + (JSON.pretty_generate model) + '-->'
+    '<!-- ' + (JSON.pretty_generate model) + '-->'
   end
 
   def self.get_json_request_pretext(name = nil)
     model = deep_copy(@mdrequest)
     model[:name] = name
-    return '<!-- ' + (JSON.pretty_generate model) + '-->'
+    '<!-- ' + (JSON.pretty_generate model) + '-->'
   end
 
   def self.get_json_response_pretext(type = nil, isArray = false)
     model = deep_copy(@mdresponse)
-    if type == nil || type == 'none'
+    if type.nil? || type == 'none'
     else
       model['@odata.type'] = if SIMPLETYPES.include? type
                                type
@@ -417,11 +417,11 @@ module SpecMaker
                              end
       model[:isCollection] = true if isArray
     end
-    return '<!-- ' + (JSON.pretty_generate model) + ' -->'
+    '<!-- ' + (JSON.pretty_generate model) + ' -->'
   end
 
   def self.sanitize_file_name(fileName)
-    return fileName.tr('_', '-')
+    fileName.tr('_', '-')
   end
 
   # module end
