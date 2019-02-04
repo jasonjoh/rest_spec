@@ -16,7 +16,7 @@ module SpecMaker
 
   JSON_EXAMPLE_FOLDER = JSON_BASE_FOLDER + 'examples/'
   BASETYPES = %w[Entity directoryObject Attachment Message OutlookItem Extension].freeze
-  BASETYPES_ALLCASE = BASETYPES.concat BASETYPES.map(&:downcase)
+  BASETYPES_ALLCASE = BASETYPES.map(&:downcase).concat BASETYPES
 
   ####
   # This is to address the special entityType:
@@ -79,12 +79,7 @@ module SpecMaker
   @annotations = {}
 
   def self.camelcase(str = '')
-    if !str.empty?
-      str
-      # str[0, 1].downcase + str[1..-1]
-    else
-      str
-    end
+    str
   end
 
   def self.parse_annotations(target, annotations)
@@ -230,7 +225,7 @@ module SpecMaker
   # and Microsoft.Graph.Recipient to Recipient
   #
   def self.get_type(type = nil)
-    camelcase t[(type.rindex('.') + 1)..-1].chomp(')')
+    camelcase type[(type.rindex('.') + 1)..-1].chomp(')')
   end
 
   def self.merge_members(current = nil, base = nil)
@@ -378,12 +373,8 @@ module SpecMaker
     entity_name = entity_name.chomp(')')
 
     mtd = preserve_method_descriptions(entity_name, mtd)
-    if @methods.key?(entity_name.downcase.to_sym)
-      @methods[entity_name.downcase.to_sym].push mtd
-    else
-      @methods[entity_name.downcase.to_sym] = []
-      @methods[entity_name.downcase.to_sym].push mtd
-    end
+    @methods[entity_name.downcase.to_sym] = [] unless @methods.key?(entity_name.downcase.to_sym)
+    @methods[entity_name.downcase.to_sym].push mtd
     # create_examplefile(entity_name, mtd[:name])
     nil
   end
@@ -426,7 +417,9 @@ module SpecMaker
     # May lose some important ones.. but if this check is removed, some really deep/complex
     # logic needs to be inserted to add the
     object['restPath'].keys.each do |k|
-      next if parent_path.downcase.include?(k.to_s.downcase)
+      # rubocop:disable Lint/NonLocalExitFromIterator
+      return if parent_path.downcase.include?(k.to_s.downcase)
+      # rubocop:enable Lint/NonLocalExitFromIterator
     end
 
     # Construct path and remove empty | and <> at the end (account for no key being available on the object.)
@@ -443,6 +436,8 @@ module SpecMaker
     return if object['properties'].empty?
 
     object['properties'].each do |item|
+      next if item['dataType'].casecmp('user').zero?
+
       fill_rest_path_internal("#{k}/#{item['name']}", item['dataType'], item['isCollection'], json_cache) if item['isRelationship']
     end
   end

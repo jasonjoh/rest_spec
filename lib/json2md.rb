@@ -52,7 +52,9 @@ module SpecMaker
       example_lines.push 'HTTP/1.1 201 Created' + NEWLINE
       example_lines.push 'Content-type: application/json' + TWONEWLINES
       example_lines.push modeldump + NEWLINE
+      # rubocop:disable Style/IdenticalConditionalBranches
       example_lines.push '```' + NEWLINE
+      # rubocop:enable Style/IdenticalConditionalBranches
 
     when 'auto_get', 'auto_list'
       example_lines.push HEADER3 + 'Request' + TWONEWLINES
@@ -80,7 +82,9 @@ module SpecMaker
       example_lines.push 'HTTP/1.1 200 OK' + NEWLINE
       example_lines.push 'Content-type: application/json' + TWONEWLINES
       example_lines.push modeldump + NEWLINE
+      # rubocop:disable Style/IdenticalConditionalBranches
       example_lines.push '```' + NEWLINE
+      # rubocop:enable Style/IdenticalConditionalBranches
 
     when 'auto_patch'
 
@@ -105,7 +109,9 @@ module SpecMaker
       example_lines.push 'HTTP/1.1 200 OK' + NEWLINE
       example_lines.push 'Content-type: application/json' + TWONEWLINES
       example_lines.push modeldump + NEWLINE
+      # rubocop:disable Style/IdenticalConditionalBranches
       example_lines.push '```' + NEWLINE
+      # rubocop:enable Style/IdenticalConditionalBranches
 
     when 'auto_delete'
       example_lines.push HEADER3 + 'Request' + TWONEWLINES
@@ -121,7 +127,9 @@ module SpecMaker
       example_lines.push get_json_response_pretext(nil) + TWONEWLINES
       example_lines.push '```http' + NEWLINE
       example_lines.push 'HTTP/1.1 204 No Content' + NEWLINE
+      # rubocop:disable Style/IdenticalConditionalBranches
       example_lines.push '```' + NEWLINE
+      # rubocop:enable Style/IdenticalConditionalBranches
     else
       example_lines.push 'The following is an example of how to call this API.' + TWONEWLINES
       example_lines.push HEADER3 + 'Request' + TWONEWLINES
@@ -160,7 +168,9 @@ module SpecMaker
         example_lines.push 'Content-type: application/json' + NEWLINE
         example_lines.push modeldump + NEWLINE
       end
+      # rubocop:disable Style/IdenticalConditionalBranches
       example_lines.push '```' + NEWLINE
+      # rubocop:enable Style/IdenticalConditionalBranches
     end
 
     example_lines
