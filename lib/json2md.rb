@@ -10,12 +10,26 @@ require 'securerandom'
 require 'optparse'
 
 module SpecMaker
-  $options = { version: 'v1.0' }
+  $options = {
+    version: 'v1.0',
+    author: '',
+    product: ''
+  }
 
   OptionParser.new do |parser|
     parser.on('-v', '--version APIVERSION',
               'Specify API version to process. Defaults to v1.0') do |v|
       $options[:version] = v
+    end
+
+    parser.on('-a', '--author GITHUB-ALIAS',
+              'Specify GitHub alias of owner of new documentation. Defaults to empty string.') do |a|
+      $options[:author] = a
+    end
+
+    parser.on('-p', '--product PRODUCT',
+              'Specify ms.prod value for new documentation. Defaults to empty string.') do |p|
+      $options[:product] = p
     end
 
     parser.on('-h', '--help', 'Prints this help.') do
@@ -269,21 +283,36 @@ module SpecMaker
     create_method_mdfile method
   end
 
+  def self.get_yaml_header(title = '', description = '')
+    header_lines = []
+    header_lines.push '---' + NEWLINE
+    header_lines.push "title: \"#{title}\"" + NEWLINE
+    header_lines.push "description: \"#{description}\"" + NEWLINE
+    header_lines.push 'localization_priority: Priority' + NEWLINE
+    header_lines.push "author: \"#{$options[:author]}\"" + NEWLINE
+    header_lines.push "ms.prod: \"#{$options[:product]}\"" + NEWLINE
+    header_lines.push '---' + TWONEWLINES
+  end
+
   # Create separate actions and functions file
   def self.create_method_mdfile(method = {}, auto_file_name = nil, path_append = '')
     action_lines = []
-    # Header and description
 
+    # Header and description
     h1name = if method[:displayName].empty?
                "#{@json_hash[:name]}: #{method[:name]}"
              else
                method[:displayName].to_s
              end
 
+    description = method[:description].empty? ? 'PROVIDE DESCRIPTION HERE' : method[:description].to_s
+
+    # YAML Header
+    action_lines = get_yaml_header(h1name, description)
+
     action_lines.push HEADER1 + h1name + TWONEWLINES
 
-    action_lines.push method[:description].empty? ? 'PROVIDE DESCRIPTION HERE' : method[:description].to_s
-    action_lines.push TWONEWLINES
+    action_lines.push description + TWONEWLINES
 
     action_lines.push PREREQ
 
@@ -418,16 +447,19 @@ module SpecMaker
   end
 
   def self.create_get_method(path_append = nil, file_name_override = nil)
-    get_method_lines = []
     # Header and description
     real_header = @json_hash[:collectionOf] ? ('List ' + @json_hash[:name]) : ('Get ' + @json_hash[:name])
-    get_method_lines.push HEADER1 + real_header + TWONEWLINES
+    description = if @json_hash[:collectionOf]
+                    "Retrieve a list of #{@json_hash[:collectionOf].downcase} objects."
+                  else
+                    "Retrieve the properties and relationships of #{@json_hash[:name].downcase} object."
+                  end
 
-    if @json_hash[:collectionOf]
-      get_method_lines.push "Retrieve a list of #{@json_hash[:collectionOf].downcase} objects." + TWONEWLINES
-    else
-      get_method_lines.push "Retrieve the properties and relationships of #{@json_hash[:name].downcase} object." + TWONEWLINES
-    end
+    # YAML Header
+    get_method_lines = get_yaml_header(real_header, description)
+
+    get_method_lines.push HEADER1 + real_header + TWONEWLINES
+    get_method_lines.push description + TWONEWLINES
 
     get_method_lines.push PREREQ
     # HTTP request
@@ -561,23 +593,22 @@ module SpecMaker
   end
 
   def self.create_patch_method(properties = [])
-    patch_method_lines = []
-
     # Header and description
+    h1name = ''
+    description = ''
+    if @json_hash[:updateDescription].empty?
+      h1name = "Update #{@json_hash[:name].downcase}"
+      description = "Update the properties of #{@json_hash[:name].downcase} object."
+    else
+      h1name = @json_hash[:updateDescription].to_s
+      description = @json_hash[:updateDescription].to_s
+    end
 
-    h1name = if @json_hash[:updateDescription].empty?
-               "Update #{@json_hash[:name].downcase}"
-             else
-               @json_hash[:updateDescription].to_s
-             end
+    # YAML Header
+    patch_method_lines = get_yaml_header(h1name, description)
 
     patch_method_lines.push HEADER1 + h1name + TWONEWLINES
-
-    if @json_hash[:updateDescription].empty?
-      patch_method_lines.push "Update the properties of #{@json_hash[:name].downcase} object." + TWONEWLINES
-    else
-      patch_method_lines.push "#{@json_hash[:updateDescription]}#{TWONEWLINES}"
-    end
+    patch_method_lines.push description + TWONEWLINES
 
     patch_method_lines.push PREREQ
     # HTTP request
@@ -638,8 +669,8 @@ module SpecMaker
   end
 
   # Conversion to specification
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def self.convert_to_spec(item = nil)
-    @mdlines = []
     is_post = nil
     @json_hash = JSON.parse(item, symbolize_names: true)
 
@@ -659,9 +690,15 @@ module SpecMaker
     methods = @json_hash[:methods]
     methods = methods.sort_by { |v| v[:name] } if !methods.nil? && methods.length > 1
 
+    title = @json_hash[:name] + ' resource type'
+    description = @json_hash[:description].empty? ? 'PROVIDE DESCRIPTION HERE' : @json_hash[:description]
+
+    # YAML Header
+    @mdlines = get_yaml_header(title, description)
+
     # Header and description
-    @mdlines.push HEADER1 + @json_hash[:name] + ' resource type' + TWONEWLINES
-    @mdlines.push "#{@json_hash[:description].empty? ? 'PROVIDE DESCRIPTION HERE' : @json_hash[:description]}#{TWONEWLINES}"
+    @mdlines.push HEADER1 + title + TWONEWLINES
+    @mdlines.push description + TWONEWLINES
 
     # Determine if there is/are: relations, properties and methods.
     is_relation, is_property, is_method, patchable = false
@@ -848,9 +885,11 @@ module SpecMaker
     file.close
     @resources_files_created += 1
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   def self.create_service_root
-    service_lines = []
+    # YAML Header
+    service_lines = get_yaml_header('Service root', 'Service root')
 
     service_lines.push HEADER1 + 'Service root' + TWONEWLINES
     service_lines.push NEWLINE + HEADER2 + 'Methods' + TWONEWLINES
@@ -898,6 +937,12 @@ module SpecMaker
 
   def self.generate_enums
     enum_lines = []
+
+    # YAML Header
+    enum_lines.push '---' + NEWLINE
+    enum_lines.push 'title: "Enumerations"' + NEWLINE
+    enum_lines.push 'description: "File to contain enumeration definitions"' + NEWLINE
+    enum_lines.push '---' + TWONEWLINES
 
     @enum_hash.each do |key, value|
       enum_lines.push HEADER3 + key + TWONEWLINES
