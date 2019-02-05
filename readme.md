@@ -1,6 +1,6 @@
 # MS Graph REST API Docs Template Generator
 
-This guide provides instructions to take a XML CSDL file and generate API and resource shell/template for the purpose of documenting the APIs. This process does not account for the descriptions/information already available in the beta and v1.0 repositories.
+This guide provides instructions to take an XML CSDL file and generate API and resource shell/template for the purpose of documenting the APIs. This process does not account for the descriptions/information already available in the beta and v1.0 repositories.
 
 ## Scenario and Usage
 
@@ -14,34 +14,41 @@ Usage:
 
 ## Pre-requisites to run this tool
 
-Ruby interpreter. Version 2.1+
-On windows machine, update PATH environment variable to point to ruby.exe file so you can run the command from any directory.
+- Ruby interpreter. Version 2.1+
+
+On Windows machines, update PATH environment variable to point to ruby.exe file so you can run the command from any directory.
 
 Type `ruby -v` command to ensure that it is installed and working correctly.
 
 ### Install activesupport gem
 
-This is required to parse XML file.
-Type `gem install activesupport` on command line.
-
-You should be set to go..
+This is required to parse XML file. Type `gem install activesupport` on command line.
 
 ## Tool Setup
 
 1. **Fork** this repository to your own GitHub account. If you already have a copy, please discard and fork fresh to get latest updates.
 1. Change directory to `rest_spec/lib` folder.
-1. Open `edmx2json.rb` file. Update the XML location in the line: `f  = Net::HTTP.get(URI.parse('https://graph.microsoft.com/v1.0/$metadata'))`
-1. If you run into SSL issues, just download the XML file locally and store the XML file into `/data` folder under the name `metadata.xml` and comment the above line and uncomment the below line: `f = File.read('../data/metadata.xml', :encoding => 'UTF-8')`. This will ensure that file is read locally and you don't have to go over the network.
 1. Run `ruby edmx2json.rb` command to generate intermediary JSON files. This takes more than 1-min to 3-hours (depending on the size of XML file) to complete.
+
+    ```Shell
+    Usage: edmx2json [options]
+        -v, --version APIVERSION         Specify API version to process. Defaults to v1.0
+        -m, --metadata FILE              Specify a local file with custom metadata.
+        -h, --help                       Prints this help.
+    ```
+
 1. Run `ruby json2md.rb` command to generate Markdown files. It can take 1-15 minutes.
-1. Find your Markdown templates in the `rest_spec/markdowns` folder.
-1. If you need to run the tool for different versions, save the markdowns/ folder content elsewhere.
+
+    ```Shell
+    Usage: json2md [options]
+        -v, --version APIVERSION         Specify API version to process. Defaults to v1.0
+        -a, --author GITHUB-ALIAS        Specify GitHub alias of owner of new documentation. Defaults to empty string.
+        -p, --product PRODUCT            Specify ms.prod value for new documentation. Defaults to empty string.
+        -h, --help                       Prints this help.
+    ```
+1. Find your Markdown templates in the `rest_spec/markdown` folder.
+1. If you need to run the tool for different versions, save the 'markdown/' folder content elsewhere.
 1. Copy the API/resource files to MS Graph fork local copy folders to make your edits.
-
-Note:
-
-- Do not even attempt to run it against ~/beta (or your custom version based on ~/beta). It will take a while to run edmx2json.rb and will stack overflow when you run json2md.rb.
-- Instead, publish a custom version by add your workload to v1.0 and run the tool.
 
 ## Edit spec files
 
