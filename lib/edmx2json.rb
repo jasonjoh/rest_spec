@@ -5,6 +5,7 @@ require 'logger'
 require 'uri'
 require 'net/https'
 require 'optparse'
+require_relative 'telemetry'
 
 module SpecMaker
   $options = { version: 'v1.0' }
@@ -25,6 +26,8 @@ module SpecMaker
       exit
     end
   end.parse!
+
+  Telemetry.log_metdata_to_json $options
 
   puts 'Processing metadata:'
   puts "  API version: #{$options[:version]}"

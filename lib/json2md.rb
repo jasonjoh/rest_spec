@@ -8,6 +8,7 @@ require 'logger'
 require 'json'
 require 'securerandom'
 require 'optparse'
+require_relative 'telemetry'
 
 module SpecMaker
   $options = {
@@ -37,6 +38,8 @@ module SpecMaker
       exit
     end
   end.parse!
+
+  Telemetry.log_json_to_markdown $options
 
   require_relative 'utils_j2m'
 
