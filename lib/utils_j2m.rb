@@ -27,10 +27,13 @@ module SpecMaker
   TWONEWLINES = "\n\n".freeze
 
   # Alert styles
-  ALERT_NOTE = '> **Note:** '.freeze
-  ALERT_IMPORTANT = '> **Important:** '.freeze
-  # ALERT_NOTE = "> [!NOTE]\n> "
-  # ALERT_IMPORTANT = "> [!IMPORTANT]\n> "
+  # ALERT_NOTE = '> **Note:** '.freeze
+  # ALERT_IMPORTANT = '> **Important:** '.freeze
+  ALERT_NOTE = "> [!NOTE]\n> ".freeze
+  ALERT_IMPORTANT = "> [!IMPORTANT]\n> ".freeze
+
+  # Beta disclaimer
+  BETA_DISCLAIMER = '[!INCLUDE [beta-disclaimer](../../includes/beta-disclaimer.md)]'.freeze
 
   TABLE_2ND_LINE =       '|:-------------|:------------|:------------|' + NEWLINE
   PROPERTY_HEADER =      '| Property     | Type        | Description |' + NEWLINE
@@ -40,18 +43,17 @@ module SpecMaker
 
   TABLE_2ND_LINE_2COL =  '|:--------------|:--------------|' + NEWLINE
   HTTP_HEADER =          '| Name          | Description   |' + NEWLINE
-  # HTTP_HEADER_SAMPLE = "| Authorization | Bearer {code} |" + NEWLINE + "| Workbook-Session-Id  | Workbook session Id that determines if changes are persisted or not. Optional.|"
   HTTP_HEADER_SAMPLE =   '| Authorization | Bearer {code} |'.freeze
   ENUM_HEADER =          '| Member       | Value       |' + NEWLINE
 
   PREREQ = HEADER2 + 'Permissions' + TWONEWLINES + 'One of the following permissions is required to call this API. To learn more, including how to choose permissions, see [Permissions](/graph/permissions-reference).' + TWONEWLINES + \
-           '|Permission type                        | Permissions (from least to most privileged) |' + NEWLINE + \
-           '|:--------------------------------------|:--------------------------------------------|' + NEWLINE + \
-           '|Delegated (work or school account)     | Not supported. |' + NEWLINE + \
-           '|Delegated (personal Microsoft account) | Not supported. |' + NEWLINE + \
-           '|Application                            | Not supported. |' + TWONEWLINES
+           '| Permission type                        | Permissions (from least to most privileged) |' + NEWLINE + \
+           '|:---------------------------------------|:--------------------------------------------|' + NEWLINE + \
+           '| Delegated (work or school account)     | Not supported. |' + NEWLINE + \
+           '| Delegated (personal Microsoft account) | Not supported. |' + NEWLINE + \
+           '| Application                            | Not supported. |' + TWONEWLINES
 
-  QRY_HEADER = '|Name|Value|Description|'.freeze
+  QRY_HEADER = '| Name | Value | Description |'.freeze
   # QRY_2ND_LINE = '|:---------------|:--------|:-------|'.freeze
   QRY_EXPAND = '|$expand|string|Comma-separated list of relationships to expand and include in the response. '.freeze
   QRY_FILTER  = '|$filter|string|Filter string that lets you filter the response based on a set of criteria.|'.freeze

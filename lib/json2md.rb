@@ -312,6 +312,8 @@ module SpecMaker
 
     action_lines.push HEADER1 + h1name + TWONEWLINES
 
+    action_lines.push BETA_DISCLAIMER + TWONEWLINES if $options[:version].casecmp('beta').zero?
+
     action_lines.push description + TWONEWLINES
 
     action_lines.push PREREQ
@@ -463,6 +465,9 @@ module SpecMaker
     get_method_lines = get_yaml_header(real_header, description)
 
     get_method_lines.push HEADER1 + real_header + TWONEWLINES
+
+    get_method_lines.push BETA_DISCLAIMER + TWONEWLINES if $options[:version].casecmp('beta').zero?
+
     get_method_lines.push description + TWONEWLINES
 
     get_method_lines.push PREREQ
@@ -612,6 +617,9 @@ module SpecMaker
     patch_method_lines = get_yaml_header(h1name, description)
 
     patch_method_lines.push HEADER1 + h1name + TWONEWLINES
+
+    patch_method_lines.push BETA_DISCLAIMER + TWONEWLINES if $options[:version].casecmp('beta').zero?
+
     patch_method_lines.push description + TWONEWLINES
 
     patch_method_lines.push PREREQ
@@ -675,7 +683,7 @@ module SpecMaker
   end
 
   # Conversion to specification
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def self.convert_to_spec(item = nil)
     is_post = nil
     @json_hash = JSON.parse(item, symbolize_names: true)
@@ -704,6 +712,9 @@ module SpecMaker
 
     # Header and description
     @mdlines.push HEADER1 + title + TWONEWLINES
+
+    @mdlines.push BETA_DISCLAIMER + TWONEWLINES if $options[:version].casecmp('beta').zero?
+
     @mdlines.push description + TWONEWLINES
 
     # Determine if there is/are: relations, properties and methods.
@@ -891,13 +902,16 @@ module SpecMaker
     file.close
     @resources_files_created += 1
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def self.create_service_root
     # YAML Header
     service_lines = get_yaml_header('Service root', 'Service root')
 
     service_lines.push HEADER1 + 'Service root' + TWONEWLINES
+
+    service_lines.push BETA_DISCLAIMER + TWONEWLINES if $options[:version].casecmp('beta').zero?
+
     service_lines.push NEWLINE + HEADER2 + 'Methods' + TWONEWLINES
     service_lines.push TASKS_HEADER + TABLE_2ND_LINE
 
