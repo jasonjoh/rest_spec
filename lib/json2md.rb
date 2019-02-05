@@ -345,7 +345,9 @@ module SpecMaker
           append_enum = ' Possible values are: `' + @enum_hash[param[:enumName]]['options'].keys.join('`, `') + '`.'
           final_param_desc += append_enum
         end
-        action_lines.push PIPE + param[:name] + PIPE + param[:dataType] + PIPE + final_param_desc + PIPE + NEWLINE
+        data_type = param[:dataType]
+        data_type += ' collection' if param[:isCollection]
+        action_lines.push PIPE + param[:name] + PIPE + data_type + PIPE + final_param_desc + PIPE + NEWLINE
       end
       action_lines.push NEWLINE
     end
@@ -377,7 +379,9 @@ module SpecMaker
           append_enum = ' Possible values are: `' + @enum_hash[param[:enumName]]['options'].keys.join('`, `') + '`.'
           final_param_desc += append_enum
         end
-        action_lines.push PIPE + param[:name] + PIPE + param[:dataType] + PIPE + final_param_desc + PIPE + NEWLINE
+        data_type = param[:dataType]
+        data_type += ' collection' if param[:isCollection]
+        action_lines.push PIPE + param[:name] + PIPE + data_type + PIPE + final_param_desc + PIPE + NEWLINE
       end
       action_lines.push NEWLINE
     else
@@ -641,7 +645,9 @@ module SpecMaker
         append_enum = ' Possible values are: `' + @enum_hash[prop[:enumName]]['options'].keys.join('`, `') + '`.'
         final_desc += append_enum
       end
-      patch_method_lines.push PIPE + prop[:name] + PIPE + prop[:dataType] + PIPE + final_desc + PIPE + NEWLINE
+      data_type = prop[:dataType]
+      data_type += ' collection' if prop[:isCollection]
+      patch_method_lines.push PIPE + prop[:name] + PIPE + data_type + PIPE + final_desc + PIPE + NEWLINE
     end
     patch_method_lines.push NEWLINE
 

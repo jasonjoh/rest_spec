@@ -228,40 +228,41 @@ module SpecMaker
     dump_complex_type(data_type)
   end
 
-  def self.dump_complex_type(complex_type = nil)
+  def self.dump_complex_type(complex_type = nil, level = 1)
     model = {}
-    fullpath = JSON_SOURCE_FOLDER + '/' + complex_type.downcase + '.json'
-    if File.file?(fullpath)
-      begin
-        object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
-        object[:properties].each do |item|
-          next if item[:name].downcase.start_with?('extension')
 
-          model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship])
-          next unless item[:isCollection]
+    unless level > 3
+      fullpath = JSON_SOURCE_FOLDER + '/' + complex_type.downcase + '.json'
+      if File.file?(fullpath)
+        begin
+          object = JSON.parse(File.read(fullpath, encoding: 'UTF-8'), symbolize_names: true)
+          object[:properties].each do |item|
+            next if item[:dataType].downcase.start_with?('extension')
 
-          model[item[:name]] = if model[item[:name]].empty?
-                                 []
-                               else
-                                 [model[item[:name]]]
-                               end
+            model[item[:name]] = assign_value2(item[:dataType], item[:name], item[:isRelationship], level + 1)
+            next unless item[:isCollection]
+
+            model[item[:name]] = if model[item[:name]].empty?
+                                   []
+                                 else
+                                   [model[item[:name]]]
+                                 end
+          end
+        rescue SystemStackError
+          model[:err] = 'SystemStackError'
         end
-      rescue SystemStackError
-        model[:err] = 'SystemStackError'
       end
     end
 
     model
   end
 
-  def self.assign_value2(data_type = nil, name = '', is_relation = false)
+  def self.assign_value2(data_type = nil, name = '', is_relation = false, level = 1)
     return {} if is_relation
 
     return {} if data_type.downcase.start_with?('extension')
 
     return {} if data_type.downcase.start_with?('post')
-
-    return {} if data_type.downcase.start_with?('extension')
 
     return 99 if NUMERICTYPES.include? data_type.downcase
 
@@ -274,13 +275,12 @@ module SpecMaker
     return "#{name}-value" if SIMPLETYPES.include? data_type.downcase
 
     # TODO: This causes stack errors with too many levels, fix this
-    dump_complex_type(data_type)
+    dump_complex_type(data_type, level)
   end
 
   def self.get_json_model_method(object_name = nil, is_collection = false, include_key = true, open_type_req = false)
     model = {}
     if SIMPLETYPES.include? object_name
-      model[:value] = assign_value(object_name, object_name)
       model[:value] = if is_collection
                         [assign_value(object_name, object_name)]
                       else
@@ -301,7 +301,7 @@ module SpecMaker
           next if item[:isKey]
         end
 
-        model[item[:name]] = if item[:name].downcase.start_with?('extension')
+        model[item[:name]] = if item[:dataType].downcase.start_with?('extension')
                                {}
                              else
                                assign_value(item[:dataType], item[:name])
